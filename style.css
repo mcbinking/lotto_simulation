@@ -451,3 +451,61 @@ tr:hover {
     color: var(--primary-cyan);
 }
 
+
+/* --- Fixes for User Feedback --- */
+
+/* 1. Golden Button Tweaks */
+.gold-button {
+    background: radial-gradient(circle, #b8860b 0%, #8b6508 100%); /* Dark Gold */
+    border: 3px solid #ffd700;
+}
+
+.currency-symbol {
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+/* 2 & 3. Light Mode Visibility Fixes */
+.formula-box {
+    background: #222;
+    padding: 15px;
+    border-radius: 5px;
+    font-family: monospace;
+    text-align: center;
+    margin: 20px 0;
+    color: #eee;
+}
+
+[data-theme='light'] .formula-box {
+    background: #e9ecef;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+.stats-panel {
+    margin-top: 20px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+[data-theme='light'] .stats-panel {
+    background: white;
+    color: #333;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+}
+
+[data-theme='light'] table {
+    color: #333;
+}
+[data-theme='light'] th {
+    background-color: #e9ecef;
+    color: #333;
+    border-bottom: 2px solid #ccc;
+}
+[data-theme='light'] td {
+    border-bottom: 1px solid #eee;
+}
+
+/* Chart text visibility in light mode */
+/* Note: Chart.js canvas colors are set in JS. We might need JS logic update. */
+

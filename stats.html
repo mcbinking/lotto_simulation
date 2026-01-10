@@ -14,9 +14,9 @@
         <div class="logo">🎱 Lotto Sim</div>
         <div class="settings-group">
             <nav>
-                <a href="index.html">홈</a>
-                <a href="about.html">소개</a>
-                <a href="stats.html" class="active">통계</a>
+                <a href="index.html" data-ko="홈" data-en="Home">홈</a>
+                <a href="about.html" data-ko="소개" data-en="About">소개</a>
+                <a href="stats.html" class="active" data-ko="통계" data-en="Stats">통계</a>
             </nav>
             <button id="langToggle" class="toggle-btn">ENG</button>
             <button id="themeToggle" class="toggle-btn">🌞</button>
@@ -24,22 +24,22 @@
     </header>
 
     <div class="container" style="max-width: 1000px; padding-top: 100px;">
-        <h1 class="title">로또 당첨 통계</h1>
+        <h1 class="title" data-ko="로또 당첨 통계" data-en="Lotto Winning Stats">로또 당첨 통계</h1>
         
-        <div class="info-section" style="margin-top: 20px; background: rgba(0,0,0,0.5); border-radius: 10px;">
-            <h2>📊 최근 10회 당첨번호</h2>
+        <div class="stats-panel">
+            <h2 data-ko="📊 최근 10회 당첨번호" data-en="📊 Last 10 Draws">📊 최근 10회 당첨번호</h2>
             <div class="table-container">
                 <table id="recentDrawsTable">
                     <thead>
                         <tr>
-                            <th>회차</th>
-                            <th>번호 1</th>
-                            <th>번호 2</th>
-                            <th>번호 3</th>
-                            <th>번호 4</th>
-                            <th>번호 5</th>
-                            <th>번호 6</th>
-                            <th>보너스</th>
+                            <th data-ko="회차" data-en="Round">회차</th>
+                            <th data-ko="번호 1" data-en="Num 1">번호 1</th>
+                            <th data-ko="번호 2" data-en="Num 2">번호 2</th>
+                            <th data-ko="번호 3" data-en="Num 3">번호 3</th>
+                            <th data-ko="번호 4" data-en="Num 4">번호 4</th>
+                            <th data-ko="번호 5" data-en="Num 5">번호 5</th>
+                            <th data-ko="번호 6" data-en="Num 6">번호 6</th>
+                            <th data-ko="보너스" data-en="Bonus">보너스</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -48,12 +48,12 @@
                 </table>
             </div>
 
-            <h2 style="margin-top: 50px;">📈 번호별 당첨 횟수 (전체 기간)</h2>
+            <h2 style="margin-top: 50px;" data-ko="📈 번호별 당첨 횟수 (전체 기간)" data-en="📈 Frequency by Number (All Time)">📈 번호별 당첨 횟수 (전체 기간)</h2>
             <div class="chart-container" style="position: relative; height:400px; width:100%">
                 <canvas id="frequencyChart"></canvas>
             </div>
 
-            <p style="text-align: right; color: #888; font-size: 0.8rem; margin-top: 20px;">
+            <p style="text-align: right; color: #888; font-size: 0.8rem; margin-top: 20px;" data-ko="* 본 자료는 동행복권의 데이터를 기반으로 작성되었습니다." data-en="* Based on data from Donghang Lottery.">
                 * 본 자료는 <a href="https://www.dhlottery.co.kr/" target="_blank" style="color: #fbc400;">동행복권</a>의 데이터를 기반으로 작성되었습니다.
             </p>
         </div>
@@ -62,11 +62,11 @@
     <footer class="main-footer">
         <p>&copy; 2026 Lotto Simulator. All rights reserved.</p>
         <div class="footer-links">
-            <a href="privacy.html">개인정보처리방침</a>
+            <a href="privacy.html" data-ko="개인정보처리방침" data-en="Privacy Policy">개인정보처리방침</a>
             <span>|</span>
-            <a href="mailto:contact@example.com">문의하기</a>
+            <a href="mailto:contact@example.com" data-ko="문의하기" data-en="Contact">문의하기</a>
             <br>
-            <div class="disclaimer" style="font-size: 0.7rem; padding: 5px; margin-top: 10px;">
+            <div class="disclaimer" style="font-size: 0.7rem; padding: 5px; margin-top: 10px;" data-ko="⚠️ 본 사이트는 재미를 위한 시뮬레이션이며 실제 당첨을 보장하지 않습니다." data-en="⚠️ This is a simulation for fun and does not guarantee winning.">
                 ⚠️ 본 사이트는 재미를 위한 시뮬레이션이며 실제 당첨을 보장하지 않습니다.
             </div>
         </div>
@@ -84,7 +84,6 @@
                 data.last_10.forEach(draw => {
                     const row = document.createElement('tr');
                     
-                    // Helper to create colored ball span
                     const createBall = (num) => {
                         let color = 'yellow';
                         if (num > 10) color = 'blue';
@@ -95,7 +94,7 @@
                     };
 
                     row.innerHTML = `
-                        <td>${draw.draw_no}회</td>
+                        <td>${draw.draw_no}</td>
                         <td>${createBall(draw.num1)}</td>
                         <td>${createBall(draw.num2)}</td>
                         <td>${createBall(draw.num3)}</td>
@@ -118,11 +117,11 @@
                             data: data.stats.data,
                             backgroundColor: data.stats.labels.map(num => {
                                 num = parseInt(num);
-                                if (num <= 10) return 'rgba(252, 238, 10, 0.8)'; // Neon Yellow
-                                if (num <= 20) return 'rgba(0, 243, 255, 0.8)'; // Neon Cyan
-                                if (num <= 30) return 'rgba(255, 0, 170, 0.8)'; // Neon Pink
-                                if (num <= 40) return 'rgba(176, 176, 176, 0.8)'; // Gray
-                                return 'rgba(10, 255, 10, 0.8)'; // Neon Green
+                                if (num <= 10) return 'rgba(252, 238, 10, 0.8)';
+                                if (num <= 20) return 'rgba(0, 243, 255, 0.8)';
+                                if (num <= 30) return 'rgba(255, 0, 170, 0.8)';
+                                if (num <= 40) return 'rgba(176, 176, 176, 0.8)';
+                                return 'rgba(10, 255, 10, 0.8)';
                             }),
                             borderColor: '#050510',
                             borderWidth: 1
@@ -146,7 +145,6 @@
                                     color: '#00f3ff',
                                     font: { family: 'monospace' },
                                     callback: function(val, index) {
-                                        // Show 1, 6, 11, ... (indices 0, 5, 10...)
                                         return index % 5 === 0 ? this.getLabelForValue(val) : '';
                                     }
                                 }
