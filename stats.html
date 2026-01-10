@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>당첨 통계 - 로또 시뮬레이터</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta name="google-adsense-account" content="ca-pub-3787589077058710">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3787589077058710" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo">🎱 Lotto Sim</div>
+        <nav>
+            <a href="index.html">홈</a>
+            <a href="about.html">소개</a>
+            <a href="stats.html" class="active">통계</a>
+        </nav>
+    </header>
+
+    <div class="container" style="max-width: 1000px; padding-top: 100px;">
+        <h1 class="title">로또 당첨 통계</h1>
+        
+        <div class="info-section" style="margin-top: 20px; background: rgba(0,0,0,0.5); border-radius: 10px;">
+            <h2>📊 최근 10회 당첨번호</h2>
+            <div class="table-container">
+                <table id="recentDrawsTable">
+                    <thead>
+                        <tr>
+                            <th>회차</th>
+                            <th>번호 1</th>
+                            <th>번호 2</th>
+                            <th>번호 3</th>
+                            <th>번호 4</th>
+                            <th>번호 5</th>
+                            <th>번호 6</th>
+                            <th>보너스</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <h2 style="margin-top: 50px;">📈 번호별 당첨 횟수 (전체 기간)</h2>
+            <div class="chart-container" style="position: relative; height:400px; width:100%">
+                <canvas id="frequencyChart"></canvas>
+            </div>
+
+            <p style="text-align: right; color: #888; font-size: 0.8rem; margin-top: 20px;">
+                * 본 자료는 <a href="https://www.dhlottery.co.kr/" target="_blank" style="color: #fbc400;">동행복권</a>의 데이터를 기반으로 작성되었습니다.
+            </p>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <p>&copy; 2026 Lotto Simulator. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="privacy.html">개인정보처리방침</a>
+            <span>|</span>
+            <a href="mailto:contact@example.com">문의하기</a>
+            <br>
+            <div class="disclaimer" style="font-size: 0.7rem; padding: 5px; margin-top: 10px;">
+                ⚠️ 본 사이트는 재미를 위한 시뮬레이션이며 실제 당첨을 보장하지 않습니다.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('data.json');
+                const data = await response.json();
+                
+                // 1. Render Table
+                const tbody = document.querySelector('#recentDrawsTable tbody');
+                data.last_10.forEach(draw => {
+                    const row = document.createElement('tr');
+                    
+                    // Helper to create colored ball span
+                    const createBall = (num) => {
+                        let color = 'yellow';
+                        if (num > 10) color = 'blue';
+                        if (num > 20) color = 'red';
+                        if (num > 30) color = 'gray';
+                        if (num > 40) color = 'green';
+                        return `<span class="ball-small ${color}">${num}</span>`;
+                    };
+
+                    row.innerHTML = `
+                        <td>${draw.draw_no}회</td>
+                        <td>${createBall(draw.num1)}</td>
+                        <td>${createBall(draw.num2)}</td>
+                        <td>${createBall(draw.num3)}</td>
+                        <td>${createBall(draw.num4)}</td>
+                        <td>${createBall(draw.num5)}</td>
+                        <td>${createBall(draw.num6)}</td>
+                        <td style="border-left: 2px solid #555;">${createBall(draw.bonus)}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                // 2. Render Chart
+                const ctx = document.getElementById('frequencyChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.stats.labels,
+                        datasets: [{
+                            label: '당첨 횟수',
+                            data: data.stats.data,
+                            backgroundColor: data.stats.labels.map(num => {
+                                num = parseInt(num);
+                                if (num <= 10) return 'rgba(251, 196, 0, 0.7)'; // yellow
+                                if (num <= 20) return 'rgba(105, 200, 242, 0.7)'; // blue
+                                if (num <= 30) return 'rgba(255, 114, 114, 0.7)'; // red
+                                if (num <= 40) return 'rgba(170, 170, 170, 0.7)'; // gray
+                                return 'rgba(176, 216, 64, 0.7)'; // green
+                            }),
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false, // Make differences more visible
+                                grid: { color: '#444' },
+                                ticks: { color: '#ddd' }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#ddd' }
+                            }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error("Failed to load data:", error);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-adsense-account" content="ca-pub-3787589077058710">
-    <title>Lotto Simulator</title>
+    <title>로또 시뮬레이터 - 홈</title>
     <link rel="stylesheet" href="style.css">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3787589077058710"
      crossorigin="anonymous"></script>
@@ -14,16 +14,17 @@
     <header class="main-header">
         <div class="logo">🎱 Lotto Sim</div>
         <nav>
-            <a href="index.html">홈</a>
-            <a href="#about">소개</a>
-            <a href="privacy.html">개인정보처리방침</a>
+            <a href="index.html" class="active">홈</a>
+            <a href="about.html">소개</a>
+            <a href="stats.html">통계</a>
         </nav>
     </header>
 
     <div class="container">
         <h1 class="title">로또 6/45 무료 시뮬레이터</h1>
-        <p class="subtitle">실제 확률 기반의 로또 번호 추첨 시뮬레이션</p>
+        <p class="subtitle">행운의 번호를 지금 바로 확인하세요!</p>
         
+        <!-- Game Machine -->
         <div class="machine-container">
             <div class="glass-dome">
                 <div class="mixing-balls" id="mixingBalls">
@@ -41,40 +42,20 @@
         <button id="drawButton" class="gold-button" aria-label="번호 추첨하기">
             <span class="currency-symbol">$</span>
         </button>
+
+        <!-- Brief Instructions for Home Page -->
+        <section class="info-section" style="background: transparent; padding: 20px 0; margin-top: 30px;">
+            <article style="text-align: center;">
+                <h2>📝 이용 방법</h2>
+                <ol style="display: inline-block; text-align: left; background: rgba(0,0,0,0.3); padding: 20px 40px; border-radius: 10px;">
+                    <li>화면 중앙의 금색 <strong>$ 버튼</strong>을 클릭하세요.</li>
+                    <li>투명한 유리 돔 안에서 공들이 섞이는 애니메이션을 감상하세요.</li>
+                    <li>순서대로 추출되는 6개의 색상별 번호를 확인하세요.</li>
+                    <li>마음에 드는 조합이 나왔다면, 실제 복권 구매 시 참고해 보세요!</li>
+                </ol>
+            </article>
+        </section>
     </div>
-
-    <!-- Content Section for SEO and AdSense Quality -->
-    <section id="about" class="info-section">
-        <article>
-            <h2>로또 6/45 시뮬레이터란?</h2>
-            <p>
-                이 <strong>무료 로또 번호 생성기</strong>는 대한민국의 동행복권 6/45 룰을 기반으로 제작된 웹 시뮬레이션입니다.
-                실제 물리적 추첨기의 혼합 과정을 시각적으로 구현하여, 단순히 번호만 나열하는 기존 생성기와는 다른 재미를 선사합니다.
-                사용자는 '골드 버튼'을 클릭하여 1부터 45까지의 숫자 중 중복되지 않는 6개의 행운의 번호를 추출할 수 있습니다.
-            </p>
-
-            <h2>로또 당첨 확률과 수학</h2>
-            <p>
-                로또 1등에 당첨될 확률은 수학적으로 <strong>8,145,060분의 1</strong>입니다.
-                이는 벼락을 맞을 확률보다 낮다고 알려져 있습니다. 본 시뮬레이터는 컴퓨터의 난수 생성 알고리즘(Random Number Generator)을 사용하여
-                모든 번호가 동일한 확률로 추출되도록 설계되었습니다. 과거의 당첨 번호 패턴을 분석하는 것도 재미있지만,
-                수학적으로 모든 추첨은 독립시행임을 기억하세요.
-            </p>
-
-            <h2>이용 방법</h2>
-            <ol>
-                <li>화면 중앙의 금색 <strong>$ 버튼</strong>을 클릭하세요.</li>
-                <li>투명한 유리 돔 안에서 공들이 섞이는 애니메이션을 감상하세요.</li>
-                <li>순서대로 추출되는 6개의 색상별 번호를 확인하세요.</li>
-                <li>마음에 드는 조합이 나왔다면, 실제 복권 구매 시 참고해 보세요!</li>
-            </ol>
-
-            <div class="disclaimer">
-                <h3>⚠️ 주의사항</h3>
-                <p>본 사이트는 재미를 위한 시뮬레이션이며, 이곳에서 생성된 번호가 실제 당첨을 보장하지 않습니다. 과도한 복권 구매는 도박 중독으로 이어질 수 있으니 건전한 여가 문화로 즐겨주세요.</p>
-            </div>
-        </article>
-    </section>
 
     <!-- Footer -->
     <footer class="main-footer">
@@ -83,6 +64,10 @@
             <a href="privacy.html">개인정보처리방침</a>
             <span>|</span>
             <a href="mailto:contact@example.com">문의하기</a>
+            <br>
+            <div class="disclaimer" style="font-size: 0.7rem; padding: 5px; margin-top: 10px;">
+                ⚠️ 본 사이트는 재미를 위한 시뮬레이션이며 실제 당첨을 보장하지 않습니다.
+            </div>
         </div>
     </footer>
 
