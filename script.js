@@ -5,11 +5,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const mixingBallsContainer = document.getElementById('mixingBalls');
     const outputChute = document.querySelector('.output-chute');
 
+    // Audio Objects
+    const sounds = {
+        button: new Audio('sounds/button.mp3'),
+        mixing: new Audio('sounds/mixing.mp3'),
+        pop: new Audio('sounds/pop.mp3'),
+        complete: new Audio('sounds/complete.mp3')
+    };
+
+    // Configure loop for mixing sound
+    sounds.mixing.loop = true;
+
     drawButton.addEventListener('click', startLottery);
 
     async function startLottery() {
         if (drawButton.disabled) return;
         
+        // Play Button Sound
+        playSound('button');
+
         // 1. Reset state
         drawButton.disabled = true;
         resultsTray.innerHTML = '';
@@ -21,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 3. Start Mixing Animation
         glassDome.classList.add('shake');
         startMixingAnimation();
+        playSound('mixing');
 
         // 4. Draw balls sequentially
         for (let i = 0; i < numbers.length; i++) {
@@ -34,7 +49,24 @@ document.addEventListener('DOMContentLoaded', () => {
         await wait(500);
         glassDome.classList.remove('shake');
         stopMixingAnimation();
+        stopSound('mixing');
+        
+        playSound('complete');
         drawButton.disabled = false;
+    }
+
+    function playSound(name) {
+        if (sounds[name]) {
+            sounds[name].currentTime = 0;
+            sounds[name].play().catch(e => console.log("Audio play failed (user interaction needed?):", e));
+        }
+    }
+
+    function stopSound(name) {
+        if (sounds[name]) {
+            sounds[name].pause();
+            sounds[name].currentTime = 0;
+        }
     }
 
     function generateLottoNumbers() {
@@ -72,6 +104,9 @@ document.addEventListener('DOMContentLoaded', () => {
         ball.style.top = `${chuteRect.top}px`;
         ball.style.transform = 'scale(0.5)';
         document.body.appendChild(ball);
+
+        // Play Pop Sound
+        playSound('pop');
 
         // 4. Phase 1: Move to Center, Scale Up, Blink
         // Force reflow
