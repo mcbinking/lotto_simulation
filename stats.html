@@ -113,13 +113,13 @@
                             data: data.stats.data,
                             backgroundColor: data.stats.labels.map(num => {
                                 num = parseInt(num);
-                                if (num <= 10) return 'rgba(251, 196, 0, 0.7)'; // yellow
-                                if (num <= 20) return 'rgba(105, 200, 242, 0.7)'; // blue
-                                if (num <= 30) return 'rgba(255, 114, 114, 0.7)'; // red
-                                if (num <= 40) return 'rgba(170, 170, 170, 0.7)'; // gray
-                                return 'rgba(176, 216, 64, 0.7)'; // green
+                                if (num <= 10) return 'rgba(252, 238, 10, 0.8)'; // Neon Yellow
+                                if (num <= 20) return 'rgba(0, 243, 255, 0.8)'; // Neon Cyan
+                                if (num <= 30) return 'rgba(255, 0, 170, 0.8)'; // Neon Pink
+                                if (num <= 40) return 'rgba(176, 176, 176, 0.8)'; // Gray
+                                return 'rgba(10, 255, 10, 0.8)'; // Neon Green
                             }),
-                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            borderColor: '#050510',
                             borderWidth: 1
                         }]
                     },
@@ -131,13 +131,20 @@
                         },
                         scales: {
                             y: {
-                                beginAtZero: false, // Make differences more visible
-                                grid: { color: '#444' },
-                                ticks: { color: '#ddd' }
+                                beginAtZero: false,
+                                grid: { color: 'rgba(0, 243, 255, 0.1)' },
+                                ticks: { color: '#00f3ff', font: { family: 'monospace' } }
                             },
                             x: {
                                 grid: { display: false },
-                                ticks: { color: '#ddd' }
+                                ticks: { 
+                                    color: '#00f3ff',
+                                    font: { family: 'monospace' },
+                                    callback: function(val, index) {
+                                        // Show 1, 6, 11, ... (indices 0, 5, 10...)
+                                        return index % 5 === 0 ? this.getLabelForValue(val) : '';
+                                    }
+                                }
                             }
                         }
                     }

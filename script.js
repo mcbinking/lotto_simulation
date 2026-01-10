@@ -7,10 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Audio Objects
     const sounds = {
-        button: new Audio('sounds/button.mp3'),
-        mixing: new Audio('sounds/mixing.mp3'),
-        pop: new Audio('sounds/pop.mp3'),
-        complete: new Audio('sounds/complete.mp3')
+        button: new Audio('sounds/button.wav'),
+        mixing: new Audio('sounds/mixing.wav'),
+        pop: new Audio('sounds/pop.wav'),
+        complete: new Audio('sounds/complete.wav')
     };
 
     // Configure loop for mixing sound
