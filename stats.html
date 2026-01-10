@@ -12,11 +12,15 @@
 <body>
     <header class="main-header">
         <div class="logo">🎱 Lotto Sim</div>
-        <nav>
-            <a href="index.html">홈</a>
-            <a href="about.html">소개</a>
-            <a href="stats.html" class="active">통계</a>
-        </nav>
+        <div class="settings-group">
+            <nav>
+                <a href="index.html">홈</a>
+                <a href="about.html">소개</a>
+                <a href="stats.html" class="active">통계</a>
+            </nav>
+            <button id="langToggle" class="toggle-btn">ENG</button>
+            <button id="themeToggle" class="toggle-btn">🌞</button>
+        </div>
     </header>
 
     <div class="container" style="max-width: 1000px; padding-top: 100px;">
@@ -68,6 +72,7 @@
         </div>
     </footer>
 
+    <script src="script.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             try {

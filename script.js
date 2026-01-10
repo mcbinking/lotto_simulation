@@ -4,6 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const glassDome = document.querySelector('.glass-dome');
     const mixingBallsContainer = document.getElementById('mixingBalls');
     const outputChute = document.querySelector('.output-chute');
+    
+    // Toggles
+    const langToggle = document.getElementById('langToggle');
+    const themeToggle = document.getElementById('themeToggle');
 
     // Audio Objects
     const sounds = {
@@ -12,40 +16,77 @@ document.addEventListener('DOMContentLoaded', () => {
         pop: new Audio('sounds/pop.wav'),
         complete: new Audio('sounds/complete.wav')
     };
-
-    // Configure loop for mixing sound
     sounds.mixing.loop = true;
 
-    drawButton.addEventListener('click', startLottery);
+    // --- Initialization ---
+    init();
+
+    function init() {
+        // Load settings
+        const storedLang = localStorage.getItem('lotto_lang') || 'ko';
+        const storedTheme = localStorage.getItem('lotto_theme') || 'dark';
+        
+        setLanguage(storedLang);
+        setTheme(storedTheme);
+        
+        // Add initial 45 balls only if container exists
+        if (mixingBallsContainer) {
+            addInitialBalls();
+        }
+    }
+
+    // --- Event Listeners ---
+    if (drawButton) {
+        drawButton.addEventListener('click', startLottery);
+    }
+    
+    if (langToggle) {
+        langToggle.addEventListener('click', () => {
+            const current = localStorage.getItem('lotto_lang') || 'ko';
+            const next = current === 'ko' ? 'en' : 'ko';
+            setLanguage(next);
+        });
+    }
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const current = localStorage.getItem('lotto_theme') || 'dark';
+            const next = current === 'dark' ? 'light' : 'dark';
+            setTheme(next);
+        });
+    }
+
+    // --- Core Logic ---
 
     async function startLottery() {
         if (drawButton.disabled) return;
         
+        // Stop Pulse
+        drawButton.classList.remove('pulse-active');
+        
         // Play Button Sound
         playSound('button');
 
-        // 1. Reset state
+        // Reset state
         drawButton.disabled = true;
         resultsTray.innerHTML = '';
-        mixingBallsContainer.innerHTML = '';
+        mixingBallsContainer.innerHTML = ''; // Clear initial balls
         
-        // 2. Generate 6 unique numbers
+        // Generate numbers
         const numbers = generateLottoNumbers();
         
-        // 3. Start Mixing Animation
+        // Start Mixing
         glassDome.classList.add('shake');
         startMixingAnimation();
         playSound('mixing');
 
-        // 4. Draw balls sequentially
+        // Draw balls sequentially
         for (let i = 0; i < numbers.length; i++) {
-            // Wait random time between 1s and 2s
             await wait(1000 + Math.random() * 500); 
-            
             await animateBallDraw(numbers[i]);
         }
 
-        // 5. Cleanup
+        // Cleanup
         await wait(500);
         glassDome.classList.remove('shake');
         stopMixingAnimation();
@@ -53,19 +94,31 @@ document.addEventListener('DOMContentLoaded', () => {
         
         playSound('complete');
         drawButton.disabled = false;
+        
+        // Restore initial balls after a delay? Or leave empty?
+        // User asked for "before pressing", implied state reset.
+        // Let's refill after done.
+        addInitialBalls();
     }
 
-    function playSound(name) {
-        if (sounds[name]) {
-            sounds[name].currentTime = 0;
-            sounds[name].play().catch(e => console.log("Audio play failed (user interaction needed?):", e));
-        }
-    }
-
-    function stopSound(name) {
-        if (sounds[name]) {
-            sounds[name].pause();
-            sounds[name].currentTime = 0;
+    function addInitialBalls() {
+        mixingBallsContainer.innerHTML = '';
+        for (let i = 1; i <= 45; i++) {
+            const ball = document.createElement('div');
+            ball.classList.add('mixing-ball'); // Re-use styling
+            ball.textContent = i;
+            
+            // Set Color
+            let color = getBallColor(i);
+            ball.style.background = color;
+            ball.style.color = 'white';
+            ball.style.textShadow = '1px 1px 2px black';
+            
+            // Random Position
+            ball.style.left = Math.random() * 210 + 'px';
+            ball.style.top = Math.random() * 210 + 'px';
+            
+            mixingBallsContainer.appendChild(ball);
         }
     }
 
@@ -78,65 +131,85 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function animateBallDraw(number) {
-        // 1. Prepare Tray Slot (Placeholder)
+        // Placeholder in tray
         const placeholder = document.createElement('div');
-        placeholder.classList.add('ball', 'ball-placeholder'); // Invisible but takes space
+        placeholder.classList.add('ball', 'ball-placeholder');
         resultsTray.appendChild(placeholder);
 
-        // 2. Get Coordinates
+        // Coordinates
         const chuteRect = outputChute.getBoundingClientRect();
         const placeholderRect = placeholder.getBoundingClientRect();
-        
-        // Center of the screen (or container) for the "Big Focus" moment
-        // Let's use the center of the container
         const containerRect = document.querySelector('.container').getBoundingClientRect();
-        const centerX = containerRect.left + containerRect.width / 2 - 20; // -20 for half ball size
-        const centerY = containerRect.top + 150; // A bit down from top
+        
+        // Center Target
+        const centerX = containerRect.left + containerRect.width / 2 - 20; 
+        const centerY = containerRect.top + 150; 
 
-        // 3. Create Flying Ball at Chute
+        // Flying Ball
         const ball = document.createElement('div');
         ball.classList.add('ball', 'active-ball');
         ball.classList.add(getColorClass(number));
         ball.textContent = number;
         
-        // Initial Position: Chute
-        ball.style.left = `${chuteRect.left + chuteRect.width/2 - 20}px`; // Center of chute
+        // Start at Chute
+        ball.style.left = `${chuteRect.left + chuteRect.width/2 - 20}px`;
         ball.style.top = `${chuteRect.top}px`;
         ball.style.transform = 'scale(0.5)';
         document.body.appendChild(ball);
 
-        // Play Pop Sound
         playSound('pop');
 
-        // 4. Phase 1: Move to Center, Scale Up, Blink
-        // Force reflow
-        ball.offsetHeight;
-        
+        // Move to Center
+        ball.offsetHeight; // force reflow
         ball.style.left = `${centerX}px`;
         ball.style.top = `${centerY}px`;
-        ball.style.transform = 'scale(2.5)'; // Big
+        ball.style.transform = 'scale(2.5)';
         
-        await wait(500); // Wait for move to center
+        await wait(500); 
         
-        // Start Blinking
+        // Blink
         ball.classList.add('blink-anim');
-        await wait(600); // Blink for a bit
+        await wait(600);
         ball.classList.remove('blink-anim');
 
-        // 5. Phase 2: Move to Tray Slot (Shrink)
+        // Move to Tray
         ball.style.left = `${placeholderRect.left}px`;
         ball.style.top = `${placeholderRect.top}px`;
         ball.style.transform = 'scale(1)';
 
-        await wait(500); // Wait for move to tray
+        await wait(500);
 
-        // 6. Finalize
+        // Dock
         ball.remove();
         placeholder.classList.remove('ball-placeholder');
-        placeholder.classList.add(getColorClass(number)); // Apply color
+        placeholder.classList.add(getColorClass(number));
         placeholder.textContent = number;
-        // Make it visible and styled as a normal result ball
         placeholder.style.visibility = 'visible';
+    }
+
+    // --- Helpers ---
+
+    function setLanguage(lang) {
+        localStorage.setItem('lotto_lang', lang);
+        
+        // Update all data-lang elements
+        document.querySelectorAll(`[data-${lang}]`).forEach(el => {
+            el.innerText = el.getAttribute(`data-${lang}`);
+        });
+
+        // Update Toggle Text
+        if (langToggle) {
+            langToggle.innerText = lang === 'ko' ? 'ENG' : 'KOR';
+        }
+    }
+
+    function setTheme(theme) {
+        localStorage.setItem('lotto_theme', theme);
+        document.documentElement.setAttribute('data-theme', theme);
+        
+        if (themeToggle) {
+            themeToggle.innerText = theme === 'dark' ? '🌞' : '🌙';
+        }
     }
 
     function getColorClass(number) {
@@ -147,49 +220,59 @@ document.addEventListener('DOMContentLoaded', () => {
         return 'green';
     }
 
+    function getBallColor(number) {
+        // Hex codes matching CSS variables
+        if (number <= 10) return '#fcee0a'; // Yellow
+        if (number <= 20) return '#00f3ff'; // Cyan
+        if (number <= 30) return '#ff00aa'; // Pink
+        if (number <= 40) return '#b0b0b0'; // Gray
+        return '#0aff0a'; // Green
+    }
+
+    function playSound(name) {
+        if (sounds[name]) {
+            sounds[name].currentTime = 0;
+            sounds[name].play().catch(() => {});
+        }
+    }
+
+    function stopSound(name) {
+        if (sounds[name]) {
+            sounds[name].pause();
+            sounds[name].currentTime = 0;
+        }
+    }
+
     function wait(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    // Animation variables
     let mixingInterval;
+    
     function startMixingAnimation() {
-        // Create mixing balls with random numbers
+        // Create dynamic mixing balls
         for (let i = 0; i < 15; i++) {
             const ball = document.createElement('div');
             ball.classList.add('mixing-ball');
             
-            // Random Number for visuals
             const randomNum = Math.floor(Math.random() * 45) + 1;
             ball.textContent = randomNum;
-            // ball.style.color = 'black'; // text color
+            ball.style.background = getBallColor(randomNum);
+            ball.style.color = 'white';
+            ball.style.textShadow = '1px 1px 2px black';
             
-            // Random Color (Visual only, doesn't match number strictly for mixing chaos?) 
-            // Actually let's match logic for better realism
-            const colorClass = getColorClass(randomNum);
-            // We need to map class to hex/color because mixing balls use inline style or we can just add class
-            // Let's just add the class but we need to override position relative to static?
-            // Mixing balls are absolute.
-            
-            // Let's just manually set background based on number to keep it simple
-            let color = '#fbc400';
-            if (randomNum > 10) color = '#69c8f2';
-            if (randomNum > 20) color = '#ff7272';
-            if (randomNum > 30) color = '#aaaaaa';
-            if (randomNum > 40) color = '#b0d840';
-            
-            ball.style.background = color;
             ball.style.left = Math.random() * 200 + 'px';
             ball.style.top = Math.random() * 200 + 'px';
             mixingBallsContainer.appendChild(ball);
         }
 
-        // Move them around randomly
+        // Animate
         mixingInterval = setInterval(() => {
             const balls = mixingBallsContainer.children;
             for (let ball of balls) {
                 ball.style.left = Math.random() * 220 + 'px';
                 ball.style.top = Math.random() * 220 + 'px';
-                // Rotate too
                 ball.style.transform = `rotate(${Math.random() * 360}deg)`;
             }
         }, 100);

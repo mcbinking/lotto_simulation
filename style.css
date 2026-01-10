@@ -370,3 +370,84 @@ tr:hover {
 .ball-small.red { border-color: var(--ball-red); color: var(--ball-red); }
 .ball-small.gray { border-color: var(--ball-gray); color: var(--ball-gray); }
 .ball-small.green { border-color: var(--ball-green); color: var(--ball-green); }
+
+/* Light Mode Overrides */
+[data-theme='light'] {
+    --bg-color: #f0f2f5;
+    --panel-bg: white;
+    --primary-cyan: #007bff; /* Blue */
+    --primary-pink: #dc3545; /* Red */
+    --text-main: #333;
+    --text-dim: #666;
+    --neon-glow: none;
+    --pink-glow: none;
+}
+
+[data-theme='light'] body {
+    background-image: none;
+}
+
+[data-theme='light'] .main-header {
+    background-color: white;
+    border-bottom: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+[data-theme='light'] .glass-dome {
+    background: rgba(255, 255, 255, 0.5);
+    border: 5px solid #ddd;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+}
+
+[data-theme='light'] .machine-base {
+    background: #eee;
+    border: 1px solid #ccc;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+[data-theme='light'] .info-section {
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+/* Nav Font Size Increase */
+.main-header nav a {
+    font-size: 1.1rem !important; /* Force override */
+    font-weight: bold;
+}
+
+/* Button Pulse Animation */
+@keyframes pulseGold {
+    0% { transform: scale(1); box-shadow: 0 0 20px var(--primary-yellow); }
+    50% { transform: scale(1.05); box-shadow: 0 0 40px var(--primary-yellow), 0 0 20px white; }
+    100% { transform: scale(1); box-shadow: 0 0 20px var(--primary-yellow); }
+}
+
+.pulse-active {
+    animation: pulseGold 2s infinite;
+}
+
+/* Toggles Container */
+.settings-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.toggle-btn {
+    background: none;
+    border: 1px solid var(--text-dim);
+    color: var(--text-main);
+    padding: 5px 10px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.3s;
+}
+
+.toggle-btn:hover {
+    border-color: var(--primary-cyan);
+    color: var(--primary-cyan);
+}
+

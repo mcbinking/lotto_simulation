@@ -13,16 +13,20 @@
     <!-- Header -->
     <header class="main-header">
         <div class="logo">🎱 Lotto Sim</div>
-        <nav>
-            <a href="index.html" class="active">홈</a>
-            <a href="about.html">소개</a>
-            <a href="stats.html">통계</a>
-        </nav>
+        <div class="settings-group">
+            <nav>
+                <a href="index.html" class="active" data-ko="홈" data-en="Home">홈</a>
+                <a href="about.html" data-ko="소개" data-en="About">소개</a>
+                <a href="stats.html" data-ko="통계" data-en="Stats">통계</a>
+            </nav>
+            <button id="langToggle" class="toggle-btn">ENG</button>
+            <button id="themeToggle" class="toggle-btn">🌞</button>
+        </div>
     </header>
 
     <div class="container">
-        <h1 class="title">로또 6/45 무료 시뮬레이터</h1>
-        <p class="subtitle">행운의 번호를 지금 바로 확인하세요!</p>
+        <h1 class="title" data-ko="로또 6/45 시뮬레이터" data-en="Lotto 6/45 Simulator">로또 6/45 시뮬레이터</h1>
+        <p class="subtitle" data-ko="행운의 번호를 지금 바로 확인하세요!" data-en="Find your lucky numbers now!">행운의 번호를 지금 바로 확인하세요!</p>
         
         <!-- Game Machine -->
         <div class="machine-container">
@@ -39,19 +43,19 @@
             <!-- Drawn balls will appear here -->
         </div>
 
-        <button id="drawButton" class="gold-button" aria-label="번호 추첨하기">
+        <button id="drawButton" class="gold-button pulse-active" aria-label="번호 추첨하기">
             <span class="currency-symbol">$</span>
         </button>
 
         <!-- Brief Instructions for Home Page -->
         <section class="info-section" style="background: transparent; padding: 20px 0; margin-top: 30px;">
             <article style="text-align: center;">
-                <h2>📝 이용 방법</h2>
+                <h2 data-ko="📝 이용 방법" data-en="📝 How to Play">📝 이용 방법</h2>
                 <ol style="display: inline-block; text-align: left; background: rgba(0,0,0,0.3); padding: 20px 40px; border-radius: 10px;">
-                    <li>화면 중앙의 금색 <strong>$ 버튼</strong>을 클릭하세요.</li>
-                    <li>투명한 유리 돔 안에서 공들이 섞이는 애니메이션을 감상하세요.</li>
-                    <li>순서대로 추출되는 6개의 색상별 번호를 확인하세요.</li>
-                    <li>마음에 드는 조합이 나왔다면, 실제 복권 구매 시 참고해 보세요!</li>
+                    <li data-ko="화면 중앙의 금색 $ 버튼을 클릭하세요." data-en="Click the golden $ button in the center.">화면 중앙의 금색 <strong>$ 버튼</strong>을 클릭하세요.</li>
+                    <li data-ko="투명한 유리 돔 안에서 공들이 섞이는 애니메이션을 감상하세요." data-en="Watch the balls mixing inside the glass dome.">투명한 유리 돔 안에서 공들이 섞이는 애니메이션을 감상하세요.</li>
+                    <li data-ko="순서대로 추출되는 6개의 색상별 번호를 확인하세요." data-en="Check the 6 colored numbers drawn sequentially.">순서대로 추출되는 6개의 색상별 번호를 확인하세요.</li>
+                    <li data-ko="마음에 드는 조합이 나왔다면, 실제 복권 구매 시 참고해 보세요!" data-en="Use the combination for your lottery ticket!">마음에 드는 조합이 나왔다면, 실제 복권 구매 시 참고해 보세요!</li>
                 </ol>
             </article>
         </section>
@@ -61,11 +65,11 @@
     <footer class="main-footer">
         <p>&copy; 2026 Lotto Simulator. All rights reserved.</p>
         <div class="footer-links">
-            <a href="privacy.html">개인정보처리방침</a>
+            <a href="privacy.html" data-ko="개인정보처리방침" data-en="Privacy Policy">개인정보처리방침</a>
             <span>|</span>
-            <a href="mailto:contact@example.com">문의하기</a>
+            <a href="mailto:contact@example.com" data-ko="문의하기" data-en="Contact">문의하기</a>
             <br>
-            <div class="disclaimer" style="font-size: 0.7rem; padding: 5px; margin-top: 10px;">
+            <div class="disclaimer" style="font-size: 0.7rem; padding: 5px; margin-top: 10px;" data-ko="⚠️ 본 사이트는 재미를 위한 시뮬레이션이며 실제 당첨을 보장하지 않습니다." data-en="⚠️ This is a simulation for fun and does not guarantee winning.">
                 ⚠️ 본 사이트는 재미를 위한 시뮬레이션이며 실제 당첨을 보장하지 않습니다.
             </div>
         </div>
