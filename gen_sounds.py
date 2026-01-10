@@ -32,12 +32,32 @@ def generate_button_sound():
     save_wav("button.wav", samples)
 
 def generate_mixing_sound():
-    duration = 2.0 # Loopable-ish
+    duration = 2.0 
     samples = []
+    
+    # Simple low-pass noise state
+    last_val = 0
+    
     for i in range(int(duration * SAMPLE_RATE)):
-        # White noise
-        val = (random.random() * 2 - 1) * 0.3
-        samples.append(val)
+        # 1. Rumble (Brownian-ish noise)
+        white = (random.random() * 2 - 1)
+        # Low pass filter: y[n] = 0.95 * y[n-1] + 0.05 * x[n]
+        rumble = 0.95 * last_val + 0.05 * white
+        last_val = rumble
+        
+        # 2. Random Clacks (balls hitting)
+        clack = 0
+        if random.random() < 0.005: # Chance of impact
+            clack_freq = random.randint(200, 600)
+            # Create a mini-impact logic? Hard to do sample-by-sample here without buffer.
+            # Simplified: Add a random spike
+            clack = (random.random() * 2 - 1) * 0.8
+        
+        # Mix: Rumble dominates, clacks pierce through
+        # Rumble is low amplitude naturally due to filtering, boost it
+        mixed = (rumble * 3.0) + clack
+        samples.append(mixed * 0.5) # Master volume
+        
     save_wav("mixing.wav", samples)
 
 def generate_pop_sound():
