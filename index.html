@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lotto Simulator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Lotto 6/45</h1>
+        
+        <div class="machine-container">
+            <div class="glass-dome">
+                <div class="mixing-balls" id="mixingBalls">
+                    <!-- Placeholder balls for animation will go here -->
+                </div>
+            </div>
+            <div class="machine-base"></div>
+            <div class="output-chute"></div>
+        </div>
+
+        <div class="results-tray" id="resultsTray">
+            <!-- Drawn balls will appear here -->
+        </div>
+
+        <button id="drawButton" class="gold-button">
+            <span class="currency-symbol">$</span>
+        </button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
