@@ -165,53 +165,58 @@
             if (!apiKey) return alert("Gemini API Key를 입력해주세요!");
             if (!selectedFile) return alert("먼저 로또 사진을 선택해주세요!");
 
-            ocrStatus.innerText = "🤖 AI가 영수증 분석 중... (수 초 소요)";
+            ocrStatus.innerText = "🤖 AI(Gemini 2.0)가 영수증 분석 중... (수 초 소요)";
             ocrStatus.style.color = "var(--primary-yellow)";
             scanResult.style.display = 'none';
             
-            // Try different model variations if one fails (404 fix)
-            const modelNames = ["gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-1.5-pro"];
-            let success = false;
+            try {
+                const genAI = new GoogleGenerativeAI(apiKey);
+                
+                // Using the confirmed working model: gemini-2.0-flash
+                const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-            for (const modelName of modelNames) {
-                try {
-                    console.log(`Trying model: ${modelName}`);
-                    const genAI = new GoogleGenerativeAI(apiKey);
-                    const model = genAI.getGenerativeModel({ model: modelName });
-
-                    const base64Data = await fileToGenerativePart(selectedFile);
-                    const prompt = `이 로또 6/45 영수증 이미지에서 회차(draw_no)와 각 라인(A, B, C, D, E)의 번호 6개를 추출해서 JSON으로만 응답해줘. 
-                    결과 형식: {"draw_no": 1205, "lines": {"A": [1, 2, 3, 4, 5, 6], "B": [10, 11, 12, 13, 14, 15]}} 
-                    텍스트 설명은 절대 하지 마.`;
-
-                    const result = await model.generateContent([prompt, base64Data]);
-                    const response = await result.response;
-                    const text = response.text();
-                    
-                    const jsonMatch = text.match(/\{[\s\S]*\}/);
-                    if (!jsonMatch) throw new Error("JSON 추출 실패");
-                    
-                    const data = JSON.parse(jsonMatch[0]);
-                    populateFields(data);
-                    
-                    ocrStatus.innerText = `✅ AI 분석 완료! (사용한 모델: ${modelName})`;
-                    ocrStatus.style.color = "var(--ball-green)";
-                    success = true;
-                    break; // Exit loop on success
-                } catch (err) {
-                    console.warn(`Model ${modelName} failed:`, err);
-                    // If it's a 404, try next model. If it's 401/403 (Auth), stop.
-                    if (err.message.includes("401") || err.message.includes("API key")) {
-                        ocrStatus.innerText = "❌ 분석 실패: API 키가 올바르지 않습니다.";
-                        ocrStatus.style.color = "var(--primary-pink)";
-                        return;
-                    }
-                    if (!modelName.includes("pro")) continue; // Try next if not the last one
+                const base64Data = await fileToGenerativePart(selectedFile);
+                
+                const prompt = `이 로또 6/45 영수증 이미지에서 다음 정보를 추출해서 JSON으로만 응답해줘. 
+                1. 회차 정보 (draw_no, 숫자만)
+                2. 각 라인(A, B, C, D, E)의 번호 6개 (lines 객체에 배열로 저장)
+                
+                응답 예시:
+                {
+                  "draw_no": 1205,
+                  "lines": {
+                    "A": [1, 2, 3, 4, 5, 6],
+                    "B": [10, 11, 12, 13, 14, 15]
+                  }
                 }
-            }
+                
+                설명 없이 오직 JSON 데이터만 반환해줘.`;
 
-            if (!success) {
-                ocrStatus.innerText = "❌ 모든 AI 모델 연결에 실패했습니다. API 키 설정이나 지역 제한을 확인해주세요.";
+                const result = await model.generateContent([prompt, base64Data]);
+                const response = await result.response;
+                const text = response.text();
+                
+                console.log("AI Raw Response:", text);
+
+                const jsonMatch = text.match(/\{[\s\S]*\}/);
+                if (!jsonMatch) throw new Error("데이터 추출 실패 (JSON 형식이 아님)");
+                
+                const data = JSON.parse(jsonMatch[0]);
+                populateFields(data);
+                
+                ocrStatus.innerText = "✅ AI 분석 완료! (Gemini 2.0 Flash)";
+                ocrStatus.style.color = "var(--ball-green)";
+            } catch (err) {
+                console.error("AI Scan Error Details:", err);
+                
+                let errorMsg = err.message;
+                if (err.message.includes("404")) {
+                    errorMsg = "모델(gemini-2.0-flash)을 찾을 수 없습니다. API 키 설정을 확인해주세요.";
+                } else if (err.message.includes("401") || err.message.includes("API key")) {
+                    errorMsg = "API 키가 올바르지 않습니다.";
+                }
+                
+                ocrStatus.innerText = "❌ 분석 실패: " + errorMsg;
                 ocrStatus.style.color = "var(--primary-pink)";
             }
         });
