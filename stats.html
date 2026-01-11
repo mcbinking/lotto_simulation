@@ -27,136 +27,43 @@
         <h1 class="title" data-ko="로또 당첨 통계" data-en="Lotto Winning Stats">로또 당첨 통계</h1>
         
         <div class="stats-panel">
-            <h2 data-ko="📊 최근 10회 당첨번호" data-en="📊 Last 10 Draws">📊 최근 10회 당첨번호</h2>
+            <h2 data-ko="📊 역대 당첨번호 (최신 15회)" data-en="📊 Recent 15 Draws">📊 역대 당첨번호 (최신 15회)</h2>
             <div class="table-container">
                 <table id="recentDrawsTable">
                     <thead>
                         <tr>
                             <th data-ko="회차" data-en="Round">회차</th>
-                            <th data-ko="번호 1" data-en="Num 1">번호 1</th>
-                            <th data-ko="번호 2" data-en="Num 2">번호 2</th>
-                            <th data-ko="번호 3" data-en="Num 3">번호 3</th>
-                            <th data-ko="번호 4" data-en="Num 4">번호 4</th>
-                            <th data-ko="번호 5" data-en="Num 5">번호 5</th>
-                            <th data-ko="번호 6" data-en="Num 6">번호 6</th>
+                            <th colspan="6" data-ko="당첨 번호" data-en="Winning Numbers">당첨 번호</th>
                             <th data-ko="보너스" data-en="Bonus">보너스</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Data will be inserted here -->
+                        <!-- JS inserted data -->
                     </tbody>
                 </table>
             </div>
 
-            <h2 style="margin-top: 50px;" data-ko="📈 번호별 당첨 횟수 (전체 기간)" data-en="📈 Frequency by Number (All Time)">📈 번호별 당첨 횟수 (전체 기간)</h2>
-            <div class="chart-container" style="position: relative; height:400px; width:100%">
-                <canvas id="frequencyChart"></canvas>
+            <h2 style="margin-top: 50px;" data-ko="📈 번호별 누적 당첨 빈도" data-en="📈 Frequency by Number">📈 번호별 누적 당첨 빈도</h2>
+            <div class="chart-container" style="position: relative; height: 400px; width: 100%; margin: 20px auto;">
+                <canvas id="freqChart"></canvas>
             </div>
 
-            <p style="text-align: right; color: #888; font-size: 0.8rem; margin-top: 20px;" data-ko="* 본 자료는 동행복권의 데이터를 기반으로 작성되었습니다." data-en="* Based on data from Donghang Lottery.">
-                * 본 자료는 <a href="https://www.dhlottery.co.kr/" target="_blank" style="color: #fbc400;">동행복권</a>의 데이터를 기반으로 작성되었습니다.
-            </p>
+            <!-- Data Commentary Section -->
+            <section class="info-section" style="max-width: 800px; margin: 40px auto; text-align: left;">
+                <h2 style="color: var(--primary-pink); border-bottom: 1px solid var(--primary-pink); padding-bottom: 10px;">
+                    📈 주간 데이터 분석 리포트
+                </h2>
+                <div id="statsCommentary" style="line-height: 1.8; color: #ddd;">
+                    <p>데이터 분석 중...</p>
+                </div>
+            </section>
         </div>
     </div>
 
     <footer class="main-footer">
         <p>&copy; 2026 Lotto Simulator. All rights reserved.</p>
-        <div class="footer-links">
-            <a href="privacy.html" data-ko="개인정보처리방침" data-en="Privacy Policy">개인정보처리방침</a>
-            <span>|</span>
-            <a href="mailto:contact@example.com" data-ko="문의하기" data-en="Contact">문의하기</a>
-            <br>
-            <div class="disclaimer" style="font-size: 0.7rem; padding: 5px; margin-top: 10px;" data-ko="⚠️ 본 사이트는 재미를 위한 시뮬레이션이며 실제 당첨을 보장하지 않습니다." data-en="⚠️ This is a simulation for fun and does not guarantee winning.">
-                ⚠️ 본 사이트는 재미를 위한 시뮬레이션이며 실제 당첨을 보장하지 않습니다.
-            </div>
-        </div>
     </footer>
 
     <script src="script.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                const response = await fetch('data.json');
-                const data = await response.json();
-                
-                // 1. Render Table
-                const tbody = document.querySelector('#recentDrawsTable tbody');
-                data.last_10.forEach(draw => {
-                    const row = document.createElement('tr');
-                    
-                    const createBall = (num) => {
-                        let color = 'yellow';
-                        if (num > 10) color = 'blue';
-                        if (num > 20) color = 'red';
-                        if (num > 30) color = 'gray';
-                        if (num > 40) color = 'green';
-                        return `<span class="ball-small ${color}">${num}</span>`;
-                    };
-
-                    row.innerHTML = `
-                        <td>${draw.draw_no}</td>
-                        <td>${createBall(draw.num1)}</td>
-                        <td>${createBall(draw.num2)}</td>
-                        <td>${createBall(draw.num3)}</td>
-                        <td>${createBall(draw.num4)}</td>
-                        <td>${createBall(draw.num5)}</td>
-                        <td>${createBall(draw.num6)}</td>
-                        <td style="border-left: 2px solid #555;">${createBall(draw.bonus)}</td>
-                    `;
-                    tbody.appendChild(row);
-                });
-
-                // 2. Render Chart
-                const ctx = document.getElementById('frequencyChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: data.stats.labels,
-                        datasets: [{
-                            label: '당첨 횟수',
-                            data: data.stats.data,
-                            backgroundColor: data.stats.labels.map(num => {
-                                num = parseInt(num);
-                                if (num <= 10) return 'rgba(252, 238, 10, 0.8)';
-                                if (num <= 20) return 'rgba(0, 243, 255, 0.8)';
-                                if (num <= 30) return 'rgba(255, 0, 170, 0.8)';
-                                if (num <= 40) return 'rgba(176, 176, 176, 0.8)';
-                                return 'rgba(10, 255, 10, 0.8)';
-                            }),
-                            borderColor: '#050510',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: false,
-                                grid: { color: 'rgba(0, 243, 255, 0.1)' },
-                                ticks: { color: '#00f3ff', font: { family: 'monospace' } }
-                            },
-                            x: {
-                                grid: { display: false },
-                                ticks: { 
-                                    color: '#00f3ff',
-                                    font: { family: 'monospace' },
-                                    callback: function(val, index) {
-                                        return index % 5 === 0 ? this.getLabelForValue(val) : '';
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-
-            } catch (error) {
-                console.error("Failed to load data:", error);
-            }
-        });
-    </script>
 </body>
 </html>

@@ -1,285 +1,230 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const drawButton = document.getElementById('drawButton');
-    const resultsTray = document.getElementById('resultsTray');
-    const glassDome = document.querySelector('.glass-dome');
-    const mixingBallsContainer = document.getElementById('mixingBalls');
-    const outputChute = document.querySelector('.output-chute');
-    
-    // Toggles
+    // Shared Elements
     const langToggle = document.getElementById('langToggle');
     const themeToggle = document.getElementById('themeToggle');
+    
+    // Main Page Elements
+    const drawButton = document.getElementById('drawButton');
+    const resultsTray = document.getElementById('resultsTray');
+    const mixingBallsContainer = document.getElementById('mixingBalls');
+    const outputChute = document.querySelector('.output-chute');
+    const magicSpellInput = document.getElementById('magicSpell');
+    const analysisReport = document.getElementById('analysisReport');
+    const ballStatsContainer = document.getElementById('ballStats');
+    const similarityReport = document.getElementById('similarityReport');
+    const simulationResults = document.getElementById('simulationResults');
 
-    // Audio Objects
+    let lottoAllData = null;
+
+    // Audio
     const sounds = {
         button: new Audio('sounds/button.wav'),
         mixing: new Audio('sounds/mixing.wav'),
         pop: new Audio('sounds/pop.wav'),
         complete: new Audio('sounds/complete.wav')
     };
-    sounds.mixing.loop = true;
+    if(sounds.mixing) sounds.mixing.loop = true;
 
     // --- Initialization ---
     init();
 
-    function init() {
-        // Load settings
-        const storedLang = localStorage.getItem('lotto_lang') || 'ko';
-        const storedTheme = localStorage.getItem('lotto_theme') || 'dark';
+    async function init() {
+        setLanguage(localStorage.getItem('lotto_lang') || 'ko');
+        setTheme(localStorage.getItem('lotto_theme') || 'dark');
         
-        setLanguage(storedLang);
-        setTheme(storedTheme);
-        
-        // Add initial 45 balls only if container exists
-        if (mixingBallsContainer) {
-            addInitialBalls();
+        if (mixingBallsContainer) addInitialBalls();
+
+        try {
+            const res = await fetch('data_all.json');
+            lottoAllData = await res.json();
+            console.log("Data All loaded:", lottoAllData.history.length);
+            
+            // If on stats page, trigger stats logic
+            if (document.getElementById('freqChart')) {
+                renderStatsPage(lottoAllData);
+            }
+        } catch (e) {
+            console.error("Data load failed", e);
         }
     }
 
-    // --- Event Listeners ---
-    if (drawButton) {
-        drawButton.addEventListener('click', startLottery);
-    }
-    
-    if (langToggle) {
-        langToggle.addEventListener('click', () => {
-            const current = localStorage.getItem('lotto_lang') || 'ko';
-            const next = current === 'ko' ? 'en' : 'ko';
-            setLanguage(next);
-        });
-    }
+    // --- Events ---
+    if (drawButton) drawButton.addEventListener('click', startLottery);
+    if (langToggle) langToggle.addEventListener('click', () => setLanguage(localStorage.getItem('lotto_lang') === 'ko' ? 'en' : 'ko'));
+    if (themeToggle) themeToggle.addEventListener('click', () => setTheme(localStorage.getItem('lotto_theme') === 'dark' ? 'light' : 'dark'));
 
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
-            const current = localStorage.getItem('lotto_theme') || 'dark';
-            const next = current === 'dark' ? 'light' : 'dark';
-            setTheme(next);
-        });
-    }
-
-    // --- Core Logic ---
-
+    // --- Functions ---
     async function startLottery() {
         if (drawButton.disabled) return;
-        
-        // Stop Pulse
-        drawButton.classList.remove('pulse-active');
-        
-        // Play Button Sound
-        playSound('button');
-
-        // Reset state
         drawButton.disabled = true;
         resultsTray.innerHTML = '';
-        mixingBallsContainer.innerHTML = ''; // Clear initial balls
+        if(ballStatsContainer) ballStatsContainer.innerHTML = '';
+        if(analysisReport) analysisReport.style.display = 'none';
         
-        // Generate numbers
-        const numbers = generateLottoNumbers();
-        
-        // Start Mixing
-        glassDome.classList.add('shake');
+        playSound('button');
+        const seed = magicSpellInput ? magicSpellInput.value.trim() : null;
+        const numbers = generateLottoNumbers(seed);
+
+        document.querySelector('.glass-dome').classList.add('shake');
         startMixingAnimation();
         playSound('mixing');
 
-        // Draw balls sequentially
         for (let i = 0; i < numbers.length; i++) {
             await wait(1000 + Math.random() * 500); 
             await animateBallDraw(numbers[i]);
         }
 
-        // Cleanup
-        await wait(500);
-        glassDome.classList.remove('shake');
+        document.querySelector('.glass-dome').classList.remove('shake');
         stopMixingAnimation();
         stopSound('mixing');
-        
         playSound('complete');
         drawButton.disabled = false;
-        
-        // Restore initial balls after a delay? Or leave empty?
-        // User asked for "before pressing", implied state reset.
-        // Let's refill after done.
         addInitialBalls();
+
+        if (lottoAllData) displayAnalysis(numbers);
     }
 
+    function generateLottoNumbers(seed) {
+        let rng = Math.random;
+        if (seed) {
+            let hash = 0;
+            for (let i = 0; i < seed.length; i++) hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+            let state = Math.abs(hash);
+            rng = () => { state = (state * 1664525 + 1013904223) % 4294967296; return state / 4294967296; };
+        }
+        const nums = new Set();
+        while (nums.size < 6) nums.add(Math.floor(rng() * 45) + 1);
+        return Array.from(nums).sort((a,b) => a-b);
+    }
+
+    function displayAnalysis(currentNumbers) {
+        analysisReport.style.display = 'block';
+        
+        // 1. Ball Frequencies
+        ballStatsContainer.innerHTML = '';
+        currentNumbers.forEach(n => {
+            const freq = lottoAllData.stats.data[n-1];
+            const div = document.createElement('div');
+            div.style.textAlign = 'center'; div.style.width = '40px'; div.style.fontSize = '0.7rem';
+            div.innerHTML = `<span style="color:${getBallColor(n)}">${n}</span><br>(${freq}회)`;
+            ballStatsContainer.appendChild(div);
+        });
+
+        // 2. Similarity Top 3
+        similarityReport.innerHTML = '';
+        const matches = lottoAllData.history.map(h => {
+            const hNums = [h.num1, h.num2, h.num3, h.num4, h.num5, h.num6];
+            const intersect = currentNumbers.filter(x => hNums.includes(x));
+            return { draw_no: h.draw_no, count: intersect.length, nums: intersect };
+        }).sort((a, b) => b.count - a.count).slice(0, 3);
+
+        matches.forEach(m => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${m.draw_no}회</strong>: ${m.count}개 일치 (${m.nums.join(', ') || '없음'})`;
+            similarityReport.appendChild(li);
+        });
+
+        // 3. 100 Game Simulation vs Latest (1205)
+        const latest = lottoAllData.history[0];
+        const winNums = [latest.num1, latest.num2, latest.num3, latest.num4, latest.num5, latest.num6];
+        let totalPrize = 0;
+        let counts = { 1:0, 2:0, 3:0, 4:0, 5:0 };
+        const base4 = currentNumbers.slice(0, 4);
+
+        for (let i = 0; i < 100; i++) {
+            let combo = [...base4];
+            while(combo.length < 6) {
+                let r = Math.floor(Math.random()*45)+1;
+                if(!combo.includes(r)) combo.push(r);
+            }
+            const match = combo.filter(x => winNums.includes(x)).length;
+            if(match === 6) { totalPrize += 2000000000; counts[1]++; }
+            else if(match === 5 && combo.includes(latest.bonus)) { totalPrize += 50000000; counts[2]++; }
+            else if(match === 5) { totalPrize += 1500000; counts[3]++; }
+            else if(match === 4) { totalPrize += 50000; counts[4]++; }
+            else if(match === 3) { totalPrize += 5000; counts[5]++; }
+        }
+
+        simulationResults.innerHTML = `
+            <p>💰 총 당첨금: <strong>${totalPrize.toLocaleString()}원</strong></p>
+            <p style="font-size: 0.8rem; margin-top:5px;">4등: ${counts[4]}회 / 5등: ${counts[5]}회 (최신 ${latest.draw_no}회 대조)</p>
+        `;
+        analysisReport.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Helper: Stats Page Rendering
+    function renderStatsPage(data) {
+        const tbody = document.querySelector('#recentDrawsTable tbody');
+        if (tbody) {
+            tbody.innerHTML = '';
+            data.history.slice(0, 15).forEach(draw => {
+                const tr = document.createElement('tr');
+                const balls = [draw.num1, draw.num2, draw.num3, draw.num4, draw.num5, draw.num6].map(n => 
+                    `<span class="ball-small ${getColorClass(n)}">${n}</span>`).join('');
+                tr.innerHTML = `<td>${draw.draw_no}</td><td colspan="6">${balls}</td><td><span class="ball-small ${getColorClass(draw.bonus)}">${draw.bonus}</span></td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        const ctx = document.getElementById('freqChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.stats.labels,
+                    datasets: [{
+                        data: data.stats.data,
+                        backgroundColor: data.stats.labels.map(n => getBallColor(parseInt(n)))
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+        }
+        
+        const commentary = document.getElementById('statsCommentary');
+        if (commentary) {
+            const stats = [...data.stats.data];
+            const maxIdx = stats.indexOf(Math.max(...stats));
+            commentary.innerHTML = `<p>역대 가장 많이 나온 번호는 <strong>${maxIdx+1}번</strong>입니다. 최근 10회차 데이터를 분석한 결과...</p>`;
+        }
+    }
+
+    // --- UI Helpers ---
     function addInitialBalls() {
         mixingBallsContainer.innerHTML = '';
         for (let i = 1; i <= 45; i++) {
-            const ball = document.createElement('div');
-            ball.classList.add('mixing-ball'); // Re-use styling
-            ball.textContent = i;
-            
-            // Set Color
-            let color = getBallColor(i);
-            ball.style.background = color;
-            ball.style.color = 'white';
-            ball.style.textShadow = '1px 1px 2px black';
-            
-            // Random Position
-            ball.style.left = Math.random() * 210 + 'px';
-            ball.style.top = Math.random() * 210 + 'px';
-            
-            mixingBallsContainer.appendChild(ball);
+            const b = document.createElement('div');
+            b.className = 'mixing-ball'; b.textContent = i;
+            b.style.background = getBallColor(i);
+            b.style.left = Math.random()*210+'px'; b.style.top = Math.random()*210+'px';
+            mixingBallsContainer.appendChild(b);
         }
     }
-
-    function generateLottoNumbers() {
-        const numbers = new Set();
-        while (numbers.size < 6) {
-            numbers.add(Math.floor(Math.random() * 45) + 1);
-        }
-        return Array.from(numbers);
+    async function animateBallDraw(num) {
+        const p = document.createElement('div'); p.className = 'ball ball-placeholder'; resultsTray.appendChild(p);
+        const b = document.createElement('div'); b.className = 'ball active-ball ' + getColorClass(num); b.textContent = num;
+        const chute = outputChute.getBoundingClientRect();
+        b.style.left = (chute.left + chute.width/2 - 20) + 'px'; b.style.top = chute.top + 'px';
+        document.body.appendChild(b);
+        playSound('pop'); await wait(100);
+        const rect = p.getBoundingClientRect();
+        b.style.left = rect.left + 'px'; b.style.top = rect.top + 'px'; b.style.transform = 'scale(1)';
+        await wait(600); b.remove(); p.className = 'ball ' + getColorClass(num); p.textContent = num;
     }
-
-    async function animateBallDraw(number) {
-        // Placeholder in tray
-        const placeholder = document.createElement('div');
-        placeholder.classList.add('ball', 'ball-placeholder');
-        resultsTray.appendChild(placeholder);
-
-        // Coordinates
-        const chuteRect = outputChute.getBoundingClientRect();
-        const placeholderRect = placeholder.getBoundingClientRect();
-        const containerRect = document.querySelector('.container').getBoundingClientRect();
-        
-        // Center Target
-        const centerX = containerRect.left + containerRect.width / 2 - 20; 
-        const centerY = containerRect.top + 150; 
-
-        // Flying Ball
-        const ball = document.createElement('div');
-        ball.classList.add('ball', 'active-ball');
-        ball.classList.add(getColorClass(number));
-        ball.textContent = number;
-        
-        // Start at Chute
-        ball.style.left = `${chuteRect.left + chuteRect.width/2 - 20}px`;
-        ball.style.top = `${chuteRect.top}px`;
-        ball.style.transform = 'scale(0.5)';
-        document.body.appendChild(ball);
-
-        playSound('pop');
-
-        // Move to Center
-        ball.offsetHeight; // force reflow
-        ball.style.left = `${centerX}px`;
-        ball.style.top = `${centerY}px`;
-        ball.style.transform = 'scale(2.5)';
-        
-        await wait(500); 
-        
-        // Blink
-        ball.classList.add('blink-anim');
-        await wait(600);
-        ball.classList.remove('blink-anim');
-
-        // Move to Tray
-        ball.style.left = `${placeholderRect.left}px`;
-        ball.style.top = `${placeholderRect.top}px`;
-        ball.style.transform = 'scale(1)';
-
-        await wait(500);
-
-        // Dock
-        ball.remove();
-        placeholder.classList.remove('ball-placeholder');
-        placeholder.classList.add(getColorClass(number));
-        placeholder.textContent = number;
-        placeholder.style.visibility = 'visible';
-    }
-
-    // --- Helpers ---
-
-    function setLanguage(lang) {
-        localStorage.setItem('lotto_lang', lang);
-        
-        // Update all data-lang elements
-        document.querySelectorAll(`[data-${lang}]`).forEach(el => {
-            el.innerText = el.getAttribute(`data-${lang}`);
-        });
-
-        // Update Toggle Text
-        if (langToggle) {
-            langToggle.innerText = lang === 'ko' ? 'ENG' : 'KOR';
-        }
-    }
-
-    function setTheme(theme) {
-        localStorage.setItem('lotto_theme', theme);
-        document.documentElement.setAttribute('data-theme', theme);
-        
-        if (themeToggle) {
-            themeToggle.innerText = theme === 'dark' ? '🌞' : '🌙';
-        }
-    }
-
-    function getColorClass(number) {
-        if (number <= 10) return 'yellow';
-        if (number <= 20) return 'blue';
-        if (number <= 30) return 'red';
-        if (number <= 40) return 'gray';
-        return 'green';
-    }
-
-    function getBallColor(number) {
-        // Hex codes matching CSS variables
-        if (number <= 10) return '#fcee0a'; // Yellow
-        if (number <= 20) return '#00f3ff'; // Cyan
-        if (number <= 30) return '#ff00aa'; // Pink
-        if (number <= 40) return '#b0b0b0'; // Gray
-        return '#0aff0a'; // Green
-    }
-
-    function playSound(name) {
-        if (sounds[name]) {
-            sounds[name].currentTime = 0;
-            sounds[name].play().catch(() => {});
-        }
-    }
-
-    function stopSound(name) {
-        if (sounds[name]) {
-            sounds[name].pause();
-            sounds[name].currentTime = 0;
-        }
-    }
-
-    function wait(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    // Animation variables
-    let mixingInterval;
-    
+    function setLanguage(l) { localStorage.setItem('lotto_lang', l); document.querySelectorAll(`[data-${l}]`).forEach(e => e.innerText = e.getAttribute(`data-${l}`)); }
+    function setTheme(t) { localStorage.setItem('lotto_theme', t); document.documentElement.setAttribute('data-theme', t); }
+    function getColorClass(n) { return n<=10?'yellow':n<=20?'blue':n<=30?'red':n<=40?'gray':'green'; }
+    function getBallColor(n) { return n<=10?'#fcee0a':n<=20?'#00f3ff':n<=30?'#ff00aa':n<=40?'#b0b0b0':'#0aff0a'; }
+    function playSound(n) { try { sounds[n].currentTime=0; sounds[n].play(); } catch(e){} }
+    function stopSound(n) { try { sounds[n].pause(); sounds[n].currentTime=0; } catch(e){} }
+    function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+    let mixInt;
     function startMixingAnimation() {
-        // Create dynamic mixing balls
-        for (let i = 0; i < 15; i++) {
-            const ball = document.createElement('div');
-            ball.classList.add('mixing-ball');
-            
-            const randomNum = Math.floor(Math.random() * 45) + 1;
-            ball.textContent = randomNum;
-            ball.style.background = getBallColor(randomNum);
-            ball.style.color = 'white';
-            ball.style.textShadow = '1px 1px 2px black';
-            
-            ball.style.left = Math.random() * 200 + 'px';
-            ball.style.top = Math.random() * 200 + 'px';
-            mixingBallsContainer.appendChild(ball);
-        }
-
-        // Animate
-        mixingInterval = setInterval(() => {
-            const balls = mixingBallsContainer.children;
-            for (let ball of balls) {
-                ball.style.left = Math.random() * 220 + 'px';
-                ball.style.top = Math.random() * 220 + 'px';
-                ball.style.transform = `rotate(${Math.random() * 360}deg)`;
-            }
+        mixInt = setInterval(() => {
+            Array.from(mixingBallsContainer.children).forEach(b => {
+                b.style.left = Math.random()*220+'px'; b.style.top = Math.random()*220+'px';
+            });
         }, 100);
     }
-
-    function stopMixingAnimation() {
-        clearInterval(mixingInterval);
-        mixingBallsContainer.innerHTML = '';
-    }
+    function stopMixingAnimation() { clearInterval(mixInt); mixingBallsContainer.innerHTML = ''; }
 });

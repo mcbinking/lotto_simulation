@@ -8,6 +8,12 @@
     <link rel="stylesheet" href="style.css">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3787589077058710"
      crossorigin="anonymous"></script>
+    <style>
+        .info-section article {
+            word-break: keep-all;
+            overflow-wrap: break-word;
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -39,24 +45,77 @@
             <div class="output-chute"></div>
         </div>
 
+        <!-- Magic Spell Input (Seed) -->
+        <div class="spell-container" style="margin-bottom: 20px;">
+            <label for="magicSpell" style="display: block; color: var(--primary-cyan); margin-bottom: 10px; font-weight: bold;">✨ 행운의 주문을 입력하세요 (선택)</label>
+            <input type="text" id="magicSpell" maxlength="100" placeholder="예: 우리가족 모두 건강하고 부자되게 해주세요!" 
+                   style="width: 80%; padding: 12px; border-radius: 25px; border: 2px solid var(--primary-pink); background: rgba(0,0,0,0.5); color: white; text-align: center; font-size: 1rem;">
+        </div>
+
         <div class="results-tray" id="resultsTray">
             <!-- Drawn balls will appear here -->
+        </div>
+        <!-- Per-ball stats -->
+        <div id="ballStats" style="display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; font-size: 0.8rem; color: #aaa; min-height: 40px;">
+            <!-- Will be populated by JS -->
         </div>
 
         <button id="drawButton" class="gold-button pulse-active" aria-label="번호 추첨하기">
             <span class="currency-symbol">$</span>
         </button>
 
-        <!-- Brief Instructions for Home Page -->
-        <section class="info-section" style="background: transparent; padding: 20px 0; margin-top: 30px;">
-            <article style="text-align: center;">
-                <h2 data-ko="📝 이용 방법" data-en="📝 How to Play">📝 이용 방법</h2>
-                <ol style="display: inline-block; text-align: left; background: rgba(0,0,0,0.3); padding: 20px 40px; border-radius: 10px;">
-                    <li data-ko="화면 중앙의 금색 $ 버튼을 클릭하세요." data-en="Click the golden $ button in the center.">화면 중앙의 금색 <strong>$ 버튼</strong>을 클릭하세요.</li>
-                    <li data-ko="투명한 유리 돔 안에서 공들이 섞이는 애니메이션을 감상하세요." data-en="Watch the balls mixing inside the glass dome.">투명한 유리 돔 안에서 공들이 섞이는 애니메이션을 감상하세요.</li>
-                    <li data-ko="순서대로 추출되는 6개의 색상별 번호를 확인하세요." data-en="Check the 6 colored numbers drawn sequentially.">순서대로 추출되는 6개의 색상별 번호를 확인하세요.</li>
-                    <li data-ko="마음에 드는 조합이 나왔다면, 실제 복권 구매 시 참고해 보세요!" data-en="Use the combination for your lottery ticket!">마음에 드는 조합이 나왔다면, 실제 복권 구매 시 참고해 보세요!</li>
-                </ol>
+        <!-- Analysis Report Section -->
+        <div id="analysisReport" class="info-section" style="display: none; text-align: left; margin-top: 40px; border-color: var(--primary-yellow);">
+            <h3 style="color: var(--primary-yellow); text-align: center; border-bottom: 1px dashed var(--primary-yellow); padding-bottom: 10px;">📊 AI 분석 리포트</h3>
+            
+            <div style="margin-bottom: 20px;">
+                <h4 style="color: var(--primary-pink);">1. 전 회차 대상 유사 번호 Top 3</h4>
+                <ul id="similarityReport" style="font-size: 0.9rem; color: #ccc; padding-left: 20px;">
+                    <li>데이터 분석 중...</li>
+                </ul>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4 style="color: var(--ball-green);">2. 10만원(100게임) 투자 시뮬레이션</h4>
+                <div id="simulationReport" style="font-size: 0.9rem; color: #ccc; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px;">
+                    <p>현재 번호의 앞 4개를 고정하고 나머지 2개만 바꿔서 100조합을 생성, 최신 회차(1205회)와 대조한 결과입니다.</p>
+                    <div id="simulationResults" style="margin-top: 10px; color: var(--primary-yellow);">
+                        계산 중...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEO Rich Content -->
+        <section class="info-section">
+            <h2 data-ko="🎲 로또 확률의 비밀" data-en="🎲 Secrets of Lotto Probability">🎲 로또 확률의 비밀</h2>
+            
+            <article>
+                <h3 style="color: var(--primary-yellow); font-size: 1.2rem; margin-top: 20px;">이 시뮬레이터의 알고리즘</h3>
+                <p>
+                    본 사이트는 단순한 <code>Math.random()</code> 함수를 넘어, 
+                    여러분이 입력한 '마법 주문(Seed)'을 기반으로 난수를 생성합니다. 
+                    사용자의 입력값이라는 변수를 더해 더욱 예측 불가능하고 개인화된 결과를 만들어냅니다.
+                </p>
+
+                <h3 style="color: var(--primary-cyan); font-size: 1.2rem; margin-top: 20px;">814만 분의 1, 그 숫자의 의미</h3>
+                <p>
+                    로또 1등에 당첨될 확률은 정확히 <strong>8,145,060분의 1</strong>입니다. 
+                    이는 벼락을 맞을 확률보다 낮다고 흔히 알려져 있습니다. 
+                    하지만 매주 누군가는 1등에 당첨됩니다. 
+                    수학적으로는 '독립 시행'이기 때문에, 지난주에 1등이 나왔다고 해서 이번 주에 안 나올 확률이 높아지는 것은 아닙니다.
+                    모든 번호 조합은 동일한 당첨 확률을 가집니다. 
+                </p>
+
+                <h3 style="color: var(--primary-pink); font-size: 1.2rem; margin-top: 20px;">당첨금 수령액과 세금의 진실</h3>
+                <p>
+                    많은 분들이 1등 당첨금만 보고 복권을 구매하지만, 실제 수령액은 세금을 제외해야 합니다. 
+                    3억 원을 초과하는 당첨금에 대해서는 <strong>33%의 세금</strong>(기타소득세 30% + 지방소득세 3%)이 부과됩니다. 
+                    예를 들어 당첨금이 20억 원이라면, 약 6억 6천만 원이 세금으로 공제되어 실 수령액은 13억 4천만 원 정도가 됩니다.
+                    <br><br>
+                    반면 3등 이하의 당첨금 중 200만 원 이하인 경우에는 세금이 부과되지 않습니다. 
+                    이 시뮬레이터는 이러한 세금 계산보다는 '당첨 확률'과 '재미'에 초점을 맞추고 있습니다.
+                </p>
             </article>
         </section>
     </div>
