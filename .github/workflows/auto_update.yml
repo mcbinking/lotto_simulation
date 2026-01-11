@@ -1,0 +1,37 @@
+name: Weekly Lotto Data Auto Update
+
+on:
+  schedule:
+    # 매주 토요일 밤 21:40 KST (UTC 12:40) 실행
+    - cron: '40 12 * * 6'
+  workflow_dispatch: 
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run lotto update script
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python update_lotto.py
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "LottoBot[Bot]"
+          git config --global user.email "actions@github.com"
+          git add data_all.json
+          git commit -m "Auto-update: Latest lottery winning numbers [$(date +'%Y-%m-%d')]" || echo "No changes to commit"
+          git push
