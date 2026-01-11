@@ -32,7 +32,7 @@ An advanced, AI-powered lottery simulation platform designed to provide strategi
 - **Instant Verification:** Cross-references scanned numbers with the `data_all.json` database to report winning ranks and prizes.
 
 ## 📝 To-Do List
-- [ ] **Automated Data Updates:** Implement a system (e.g., via GitHub Actions) to automatically fetch and update the latest lottery winning numbers every Saturday.
+- [x] ~~**Automated Data Updates:** Implement a system (e.g., via GitHub Actions) to automatically fetch and update the latest lottery winning numbers every Saturday. (Completed: 2026-01-12)~~
 
 ## 🛠 Tech Stack
 - **Frontend:** HTML5, CSS3 (Cyberpunk/Dark Theme), Vanilla JavaScript.
