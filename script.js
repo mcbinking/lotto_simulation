@@ -124,30 +124,68 @@ document.addEventListener('DOMContentLoaded', () => {
             similarityReport.appendChild(li);
         });
 
-        // 3. 100 Game Simulation vs Latest (1205)
+        // 3. 100 Game Simulation (100,000 KRW) vs Latest (1205)
         const latest = lottoAllData.history[0];
         const winNums = [latest.num1, latest.num2, latest.num3, latest.num4, latest.num5, latest.num6];
+        const bonus = latest.bonus;
+        
         let totalPrize = 0;
         let counts = { 1:0, 2:0, 3:0, 4:0, 5:0 };
-        const base4 = currentNumbers.slice(0, 4);
+        
+        const allCombos = [];
 
-        for (let i = 0; i < 100; i++) {
-            let combo = [...base4];
-            while(combo.length < 6) {
-                let r = Math.floor(Math.random()*45)+1;
-                if(!combo.includes(r)) combo.push(r);
-            }
-            const match = combo.filter(x => winNums.includes(x)).length;
-            if(match === 6) { totalPrize += 2000000000; counts[1]++; }
-            else if(match === 5 && combo.includes(latest.bonus)) { totalPrize += 50000000; counts[2]++; }
-            else if(match === 5) { totalPrize += 1500000; counts[3]++; }
-            else if(match === 4) { totalPrize += 50000; counts[4]++; }
-            else if(match === 3) { totalPrize += 5000; counts[5]++; }
+        // CASE 1: Original 6 numbers
+        allCombos.push([...currentNumbers]);
+
+        // CASE 2-7: One ball different (from 6th down to 1st)
+        for (let i = 5; i >= 0; i--) {
+            let combo = [...currentNumbers];
+            let r;
+            do {
+                r = Math.floor(Math.random() * 45) + 1;
+            } while (currentNumbers.includes(r));
+            combo[i] = r;
+            allCombos.push(combo.sort((a, b) => a - b));
         }
 
+        // CASE 8-100: Fix first 4, vary last 2 (93 games)
+        const base4 = currentNumbers.slice(0, 4);
+        while (allCombos.length < 100) {
+            let combo = [...base4];
+            while (combo.length < 6) {
+                let r = Math.floor(Math.random() * 45) + 1;
+                if (!combo.includes(r)) combo.push(r);
+            }
+            allCombos.push(combo.sort((a, b) => a - b));
+        }
+
+        // Calculate Results
+        allCombos.forEach(combo => {
+            const match = combo.filter(x => winNums.includes(x)).length;
+            const hasBonus = combo.includes(bonus);
+
+            if (match === 6) { totalPrize += 2000000000; counts[1]++; }
+            else if (match === 5 && hasBonus) { totalPrize += 50000000; counts[2]++; }
+            else if (match === 5) { totalPrize += 1500000; counts[3]++; }
+            else if (match === 4) { totalPrize += 50000; counts[4]++; }
+            else if (match === 3) { totalPrize += 5000; counts[5]++; }
+        });
+
         simulationResults.innerHTML = `
-            <p>💰 총 당첨금: <strong>${totalPrize.toLocaleString()}원</strong></p>
-            <p style="font-size: 0.8rem; margin-top:5px;">4등: ${counts[4]}회 / 5등: ${counts[5]}회 (최신 ${latest.draw_no}회 대조)</p>
+            <div style="padding: 10px; border: 1px solid rgba(0, 243, 255, 0.3); border-radius: 5px;">
+                <p>💰 총 당첨금: <strong style="font-size: 1.1rem; color:var(--primary-yellow);">${totalPrize.toLocaleString()}원</strong></p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 10px; font-size: 0.85rem;">
+                    <div>1등(6개): ${counts[1]}회</div>
+                    <div>2등(5개+B): ${counts[2]}회</div>
+                    <div>3등(5개): ${counts[3]}회</div>
+                    <div>4등(4개): ${counts[4]}회</div>
+                    <div>5등(3개): ${counts[5]}회</div>
+                </div>
+                <p style="margin-top: 10px; font-size: 0.8rem; color: #888;">
+                    * 분석 조건: 원본 1조합 + 번호 1개 변형 6조합 + 반자동(4개 고정) 93조합<br>
+                    * 실제 <strong>${latest.draw_no}회차</strong> 결과와 대조한 가상 당첨금입니다.
+                </p>
+            </div>
         `;
         analysisReport.scrollIntoView({ behavior: 'smooth' });
     }
