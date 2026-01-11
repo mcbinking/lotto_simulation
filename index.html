@@ -47,7 +47,7 @@
 
         <!-- Magic Spell Input (Seed) -->
         <div class="spell-container" style="margin-bottom: 20px;">
-            <label for="magicSpell" style="display: block; color: var(--primary-cyan); margin-bottom: 10px; font-weight: bold;">✨ 행운의 주문을 입력하세요 (선택)</label>
+            <label for="magicSpell" style="display: block; color: var(--primary-cyan); margin-bottom: 10px; font-weight: bold;">✨ 나만의 로또 번호를 위한 행운의 주문을 입력하세요 (선택)</label>
             <input type="text" id="magicSpell" maxlength="100" placeholder="예: 우리가족 모두 건강하고 부자되게 해주세요!" 
                    style="width: 80%; padding: 12px; border-radius: 25px; border: 2px solid var(--primary-pink); background: rgba(0,0,0,0.5); color: white; text-align: center; font-size: 1rem;">
         </div>
@@ -56,6 +56,7 @@
             <!-- Drawn balls will appear here -->
         </div>
         <!-- Per-ball stats -->
+        <div style="color: var(--primary-cyan); font-size: 0.8rem; margin-bottom: 5px; font-weight: bold;">[ 번호별 역대 당첨 빈도 ]</div>
         <div id="ballStats" style="display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; font-size: 0.8rem; color: #aaa; min-height: 40px;">
             <!-- Will be populated by JS -->
         </div>
