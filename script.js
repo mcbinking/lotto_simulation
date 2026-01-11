@@ -1,11 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Shared Elements
-    const langToggle = document.getElementById('langToggle');
-    const themeToggle = document.getElementById('themeToggle');
-    
     // Main Page Elements
     const drawButton = document.getElementById('drawButton');
     const resultsTray = document.getElementById('resultsTray');
+    const glassDome = document.querySelector('.glass-dome');
     const mixingBallsContainer = document.getElementById('mixingBalls');
     const outputChute = document.querySelector('.output-chute');
     const magicSpellInput = document.getElementById('magicSpell');
@@ -29,29 +26,26 @@ document.addEventListener('DOMContentLoaded', () => {
     init();
 
     async function init() {
-        setLanguage(localStorage.getItem('lotto_lang') || 'ko');
-        setTheme(localStorage.getItem('lotto_theme') || 'dark');
+        // Force Dark Mode through attribute
+        document.documentElement.setAttribute('data-theme', 'dark');
         
         if (mixingBallsContainer) addInitialBalls();
 
         try {
             const res = await fetch('data_all.json');
             lottoAllData = await res.json();
-            console.log("Data All loaded:", lottoAllData.history.length);
             
             // If on stats page, trigger stats logic
             if (document.getElementById('freqChart')) {
                 renderStatsPage(lottoAllData);
             }
         } catch (e) {
-            console.error("Data load failed", e);
+            console.error("데이터 로딩 실패", e);
         }
     }
 
     // --- Events ---
     if (drawButton) drawButton.addEventListener('click', startLottery);
-    if (langToggle) langToggle.addEventListener('click', () => setLanguage(localStorage.getItem('lotto_lang') === 'ko' ? 'en' : 'ko'));
-    if (themeToggle) themeToggle.addEventListener('click', () => setTheme(localStorage.getItem('lotto_theme') === 'dark' ? 'light' : 'dark'));
 
     // --- Functions ---
     async function startLottery() {
@@ -100,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayAnalysis(currentNumbers) {
         analysisReport.style.display = 'block';
         
-        // 1. Ball Frequencies
+        // 1. 번호별 당첨 빈도
         ballStatsContainer.innerHTML = '';
         currentNumbers.forEach(n => {
             const freq = lottoAllData.stats.data[n-1];
@@ -110,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ballStatsContainer.appendChild(div);
         });
 
-        // 2. Similarity Top 3
+        // 2. 유사 번호 Top 3
         similarityReport.innerHTML = '';
         const matches = lottoAllData.history.map(h => {
             const hNums = [h.num1, h.num2, h.num3, h.num4, h.num5, h.num6];
@@ -124,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
             similarityReport.appendChild(li);
         });
 
-        // 3. 100 Game Simulation (100,000 KRW) vs Latest (1205)
+        // 3. 100게임 시뮬레이션
         const latest = lottoAllData.history[0];
         const winNums = [latest.num1, latest.num2, latest.num3, latest.num4, latest.num5, latest.num6];
         const bonus = latest.bonus;
@@ -133,23 +127,15 @@ document.addEventListener('DOMContentLoaded', () => {
         let counts = { 1:0, 2:0, 3:0, 4:0, 5:0 };
         
         const allCombos = [];
+        allCombos.push([...currentNumbers]); 
 
-        // CASE 1: Original 6 numbers
-        allCombos.push([...currentNumbers]);
-
-        // CASE 2-7: One ball different (from 6th down to 1st)
-        for (let i = 5; i >= 0; i--) {
+        for (let i = 5; i >= 0; i--) { 
             let combo = [...currentNumbers];
-            let r;
-            do {
-                r = Math.floor(Math.random() * 45) + 1;
-            } while (currentNumbers.includes(r));
-            combo[i] = r;
-            allCombos.push(combo.sort((a, b) => a - b));
+            let r; do { r = Math.floor(Math.random() * 45) + 1; } while (currentNumbers.includes(r));
+            combo[i] = r; allCombos.push(combo.sort((a, b) => a - b));
         }
 
-        // CASE 8-100: Fix first 4, vary last 2 (93 games)
-        const base4 = currentNumbers.slice(0, 4);
+        const base4 = currentNumbers.slice(0, 4); 
         while (allCombos.length < 100) {
             let combo = [...base4];
             while (combo.length < 6) {
@@ -159,13 +145,11 @@ document.addEventListener('DOMContentLoaded', () => {
             allCombos.push(combo.sort((a, b) => a - b));
         }
 
-        // Calculate Results
         allCombos.forEach(combo => {
             const match = combo.filter(x => winNums.includes(x)).length;
             const hasBonus = combo.includes(bonus);
-
             if (match === 6) { totalPrize += 2000000000; counts[1]++; }
-            else if (match === 5 && hasBonus) { totalPrize += 50000000; counts[2]++; }
+            else if (match === 5 && hasBonus) { totalPrize += 60000000; counts[2]++; }
             else if (match === 5) { totalPrize += 1500000; counts[3]++; }
             else if (match === 4) { totalPrize += 50000; counts[4]++; }
             else if (match === 3) { totalPrize += 5000; counts[5]++; }
@@ -175,22 +159,19 @@ document.addEventListener('DOMContentLoaded', () => {
             <div style="padding: 10px; border: 1px solid rgba(0, 243, 255, 0.3); border-radius: 5px;">
                 <p>💰 총 당첨금: <strong style="font-size: 1.1rem; color:var(--primary-yellow);">${totalPrize.toLocaleString()}원</strong></p>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 10px; font-size: 0.85rem;">
-                    <div>1등(6개): ${counts[1]}회</div>
-                    <div>2등(5개+B): ${counts[2]}회</div>
-                    <div>3등(5개): ${counts[3]}회</div>
-                    <div>4등(4개): ${counts[4]}회</div>
+                    <div>1등(6개): ${counts[1]}회</div><div>2등(5개+B): ${counts[2]}회</div>
+                    <div>3등(5개): ${counts[3]}회</div><div>4등(4개): ${counts[4]}회</div>
                     <div>5등(3개): ${counts[5]}회</div>
                 </div>
                 <p style="margin-top: 10px; font-size: 0.8rem; color: #888;">
                     * 분석 조건: 원본 1조합 + 번호 1개 변형 6조합 + 반자동(4개 고정) 93조합<br>
                     * 실제 <strong>${latest.draw_no}회차</strong> 결과와 대조한 가상 당첨금입니다.
                 </p>
-            </div>
-        `;
+            </div>`;
+        
         analysisReport.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // Helper: Stats Page Rendering
     function renderStatsPage(data) {
         const tbody = document.querySelector('#recentDrawsTable tbody');
         if (tbody) {
@@ -224,39 +205,35 @@ document.addEventListener('DOMContentLoaded', () => {
             const stats = data.stats.data;
             let indexedStats = stats.map((val, idx) => ({ num: idx + 1, count: val }));
             indexedStats.sort((a, b) => b.count - a.count);
-            
-            const top5 = indexedStats.slice(0, 5).map(i => `<b style="color:var(--primary-pink)">${i.num}번</b>(${i.count}회)`);
-            const bottom5 = indexedStats.slice(-5).reverse().map(i => `<b style="color:var(--primary-cyan)">${i.num}번</b>(${i.count}회)`);
+            const top5 = indexedStats.slice(0, 5);
+            const bottom5 = indexedStats.slice(-5).reverse();
 
             // Recent Trend (last 15)
             let oddCount = 0;
             let rangeCounts = { 1:0, 10:0, 20:0, 30:0, 40:0 };
             const recent15 = data.history.slice(0, 15);
-            
             recent15.forEach(draw => {
                 [draw.num1, draw.num2, draw.num3, draw.num4, draw.num5, draw.num6].forEach(n => {
                     if(n % 2 !== 0) oddCount++;
                     const range = Math.floor((n-1)/10)*10 || 1;
                     if(rangeCounts.hasOwnProperty(range)) rangeCounts[range]++;
-                    else rangeCounts[1]++; // fallback for 1-9
+                    else rangeCounts[1]++;
                 });
             });
-
             const oddP = ((oddCount / 90) * 100).toFixed(1);
             const mostActiveRange = Object.keys(rangeCounts).reduce((a, b) => rangeCounts[a] > rangeCounts[b] ? a : b);
 
             commentary.innerHTML = `
                 <div style="font-size: 0.95rem; line-height: 1.8;">
                     <p>전체 <b>${data.history.length}회차</b>의 데이터를 정밀 분석한 결과입니다.</p>
-                    <p style="margin-top:10px;">📊 <b>역대 빈출 번호:</b> 가장 많이 등장한 상위 5개 번호는 ${top5.join(', ')} 입니다. 이 번호들은 통계적으로 평균보다 약 15% 이상 높은 출현 빈도를 보이고 있습니다.</p>
-                    <p>❄️ <b>역대 저출 번호:</b> 반면 당첨 횟수가 가장 적은 하위 5개 번호는 ${bottom5.join(', ')}로 나타났습니다. 이는 단순한 무작위의 결과일 수도 있으나, 번호 선택 시 참고할 만한 지표가 됩니다.</p>
-                    <p style="margin-top:10px;">📉 <b>최근 15회차 트렌드:</b> 최근 당첨 번호의 <b>홀짝 비율은 ${oddP}% : ${(100-oddP).toFixed(1)}%</b>로 ${oddP > 55 ? '홀수가 상당히 강세' : (oddP < 45 ? '짝수가 더 자주 출현' : '매우 균형 잡힌 상태')}를 보이고 있습니다.</p>
-                    <p>🎯 <b>번호대별 분포:</b> 최근 데이터에서는 <b>${mostActiveRange === '1' ? '1~10번' : mostActiveRange + '번'}대</b> 숫자들이 가장 활발하게 쏟아져 나오고 있습니다. 특정 구간에 당첨 번호가 쏠리는 현상은 로또에서 자주 발견되는 패턴 중 하나입니다.</p>
-                    <p style="margin-top:15px; border-top: 1px solid #444; padding-top:10px; font-style: italic; color: #aaa;">
-                        💡 <b>수학적 조언:</b> 과거의 당첨 횟수가 미래의 당첨 확률을 보장하지는 않습니다. 하지만 이러한 통계 데이터는 번호 조합 시 "너무 극단적인 선택(예: 모두 홀수, 한 구간에 몰빵)"을 피하게 도와주는 훌륭한 나침반이 될 수 있습니다.
+                    <p style="margin-top:10px;">📊 <b>역대 빈출 번호:</b> 가장 많이 등장한 상위 5개 번호는 ${top5.map(i => `<b style="color:var(--primary-pink)">${i.num}번</b>(${i.count}회)`).join(', ')} 입니다.</p>
+                    <p>❄️ <b>역대 저출 번호:</b> 반면 당첨 횟수가 가장 적은 하위 5개 번호는 ${bottom5.map(i => `<b style="color:var(--primary-cyan)">${i.num}번</b>(${i.count}회)`).join(', ')}로 나타났습니다.</p>
+                    <p style="margin-top:10px;">📉 <b>최근 15회차 트렌드:</b> 최근 당첨 번호의 <b>홀짝 비율은 ${oddP}% : ${(100-oddP).toFixed(1)}%</b>로 ${oddP > 55 ? '홀수가 강세' : (oddP < 45 ? '짝수가 더 자주 출현' : '균형 잡힌 상태')}를 보이고 있습니다.</p>
+                    <p>🎯 <b>번호대별 분포:</b> 최근 데이터에서는 <b>${mostActiveRange === '1' ? '1~10번' : mostActiveRange + '번'}대</b> 숫자들이 가장 활발하게 출현하고 있습니다.</p>
+                    <p style="margin-top:15px; border-top: 1px solid #444; padding-top:10px; font-style: italic; color: #888;">
+                        💡 <b>수학적 조언:</b> 과거의 당첨 데이터가 미래의 결과를 보장하지는 않으나, 극단적인 조합을 피하는 지표로 활용될 수 있습니다.
                     </p>
-                </div>
-            `;
+                </div>`;
         }
     }
 
@@ -282,13 +259,11 @@ document.addEventListener('DOMContentLoaded', () => {
         b.style.left = rect.left + 'px'; b.style.top = rect.top + 'px'; b.style.transform = 'scale(1)';
         await wait(600); b.remove(); p.className = 'ball ' + getColorClass(num); p.textContent = num;
     }
-    function setLanguage(l) { localStorage.setItem('lotto_lang', l); document.querySelectorAll(`[data-${l}]`).forEach(e => e.innerText = e.getAttribute(`data-${l}`)); }
-    function setTheme(t) { localStorage.setItem('lotto_theme', t); document.documentElement.setAttribute('data-theme', t); }
+    function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
     function getColorClass(n) { return n<=10?'yellow':n<=20?'blue':n<=30?'red':n<=40?'gray':'green'; }
     function getBallColor(n) { return n<=10?'#fcee0a':n<=20?'#00f3ff':n<=30?'#ff00aa':n<=40?'#b0b0b0':'#0aff0a'; }
     function playSound(n) { try { sounds[n].currentTime=0; sounds[n].play(); } catch(e){} }
     function stopSound(n) { try { sounds[n].pause(); sounds[n].currentTime=0; } catch(e){} }
-    function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
     let mixInt;
     function startMixingAnimation() {
         mixInt = setInterval(() => {

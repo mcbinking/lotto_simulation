@@ -5,18 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로또 스캔 - 로또 시뮬레이터</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Tesseract.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    <!-- Google AI SDK -->
     <script type="importmap">
-      {
-        "imports": {
-          "@google/generative-ai": "https://esm.run/@google/generative-ai"
-        }
-      }
+      { "imports": { "@google/generative-ai": "https://esm.run/@google/generative-ai" } }
     </script>
 </head>
-<body>
+<body data-theme="dark">
     <header class="main-header">
         <div class="logo">🎱 Lotto Sim</div>
         <div class="settings-group">
@@ -26,8 +19,6 @@
                 <a href="stats.html">통계</a>
                 <a href="scan.html" class="active">번호당첨확인<span style="font-size:0.6rem; vertical-align:top;">(Beta)</span></a>
             </nav>
-            <button id="langToggle" class="toggle-btn">ENG</button>
-            <button id="themeToggle" class="toggle-btn">🌞</button>
         </div>
     </header>
 
@@ -35,7 +26,6 @@
         <h1 class="title">내 로또 번호 당첨 확인(AI)</h1>
         <p class="subtitle">인공지능이 영수증을 분석하여 번호를 정확하게 읽어드립니다.</p>
 
-        <!-- API Key Config & Usage Warning -->
         <div style="margin-bottom: 20px; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px; border: 1px solid #333; text-align: left;">
             <div style="margin-bottom: 10px;">
                 <label style="font-size: 0.9rem; color: var(--primary-cyan); font-weight: bold;">🔑 Gemini API Key 입력:</label>
@@ -48,9 +38,9 @@
                 <ul style="padding-left: 20px; margin-bottom: 10px;">
                     <li>개인 API 키 사용 시 구글 정책에 따라 <strong>사용량 제한(Limit)</strong>에 걸릴 수 있습니다.</li>
                     <li>무료 티어를 초과하거나 설정에 따라 <strong>과금이 발생할 수 있으니</strong> 무분별한 반복 테스트는 지양해 주세요.</li>
-                    <li>실시간 사용량은 <a href="https://aistudio.google.com/app/plan_and_billing" target="_blank" style="color: var(--primary-cyan); text-decoration: underline;">Google AI Studio 사용량 관리</a> 페이지에서 확인하실 수 있습니다.</li>
+                    <li>실시간 사용량은 <a href="https://aistudio.google.com/app/usage" target="_blank" style="color: var(--primary-cyan); text-decoration: underline;">Google AI Studio 사용량 관리</a> 페이지에서 확인하실 수 있습니다.</li>
                 </ul>
-                <p>💡 <strong>꿀팁:</strong> 스마트폰 카메라의 <b>문서 스캔 기능</b>을 이용해 실제 로또 용지를 그림자 없이 깨끗하게 촬영하시면 인식률이 훨씬 높아집니다.</p>
+                <p>💡 <strong>꿀팁:</strong> 스마트폰 카메라의 문서 스캔 기능을 이용해 실제 로또 용지를 그림자 없이 깨끗하게 촬영하시면 인식률이 훨씬 높아집니다.</p>
             </div>
         </div>
 
@@ -66,38 +56,27 @@
             </div>
         </section>
 
-        <!-- Preview and Progress -->
         <div id="previewContainer" style="display: none; margin-top: 30px; text-align: center;">
             <img id="selectedImage" style="max-width: 100%; border-radius: 10px; border: 1px solid var(--primary-pink); max-height: 400px; object-fit: contain;">
             <div id="ocrStatus" style="margin-top: 20px; color: var(--primary-yellow); font-weight: bold;"></div>
         </div>
 
-        <!-- Scan Result (Editable) -->
         <div id="scanResult" class="info-section" style="display: none; margin-top: 40px; text-align: left;">
             <h2 style="color: var(--primary-cyan); border-bottom: 1px solid var(--primary-cyan); padding-bottom: 10px;">🔍 인식 결과 확인</h2>
             <p style="margin-bottom: 20px; font-size: 0.9rem;">인식된 내용이 틀렸다면 직접 수정하신 후 [당첨 확인]을 눌러주세요.</p>
-            
             <div style="margin-bottom: 15px;">
                 <label style="color: var(--primary-yellow);">회차 정보:</label>
                 <input type="number" id="scannedDrawNo" style="background: #111; color: #fff; border: 1px solid #444; padding: 5px 10px; width: 80px; margin-left: 10px;"> 회
             </div>
-
-            <div id="linesContainer">
-                <!-- A, B, C, D, E lines will be generated here -->
-            </div>
-
+            <div id="linesContainer"></div>
             <button id="verifyButton" class="hp-btn" style="width: 100%; margin-top: 20px; border: none; font-size: 1.1rem;">🏆 당첨 확인하기</button>
         </div>
 
-        <!-- Final Win Status -->
         <div id="winStatus" class="info-section" style="display: none; margin-top: 30px; border-color: var(--ball-green); background: rgba(10, 255, 10, 0.05);">
             <h2 style="color: var(--ball-green); text-align: center;">🎉 결과 리포트</h2>
-            <div id="winDetail" style="margin-top: 20px; line-height: 2;">
-                <!-- Detailed win results -->
-            </div>
+            <div id="winDetail" style="margin-top: 20px; line-height: 2;"></div>
         </div>
 
-        <!-- Disclaimer & Security Warning (Moved to bottom) -->
         <div style="margin-top: 50px; padding: 20px; background: rgba(255, 0, 0, 0.05); border: 1px solid rgba(255, 0, 0, 0.1); border-radius: 10px; font-size: 0.8rem; line-height: 1.6; color: #888;">
             <p style="color: #aaa; font-weight: bold; margin-bottom: 5px;">⚠️ 이용 주의사항 및 보안 안내</p>
             <ul style="padding-left: 15px;">
@@ -109,13 +88,11 @@
         </div>
     </div>
 
-    <footer class="main-footer">
-        <p>&copy; 2026 Lotto Simulator. All rights reserved.</p>
-    </footer>
-
+    <footer class="main-footer"><p>&copy; 2026 Lotto Simulator. All rights reserved.</p></footer>
+    <script src="script.js"></script>
     <script type="module">
         import { GoogleGenerativeAI } from "@google/generative-ai";
-
+        const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
         const imageInput = document.getElementById('imageInput');
         const aiScanBtn = document.getElementById('aiScanBtn');
         const apiKeyInput = document.getElementById('apiKeyInput');
@@ -128,186 +105,102 @@
         const verifyButton = document.getElementById('verifyButton');
         const winStatus = document.getElementById('winStatus');
         const winDetail = document.getElementById('winDetail');
+        let lottoAllData = null, selectedFile = null;
 
-        let lottoAllData = null;
-        let selectedFile = null;
-
-        // Initialize: Load API Key from LocalStorage
         apiKeyInput.value = localStorage.getItem('gemini_api_key') || '';
         apiKeyInput.addEventListener('change', (e) => localStorage.setItem('gemini_api_key', e.target.value));
 
-        // Load data with error handling for local file access
         async function loadLottoData() {
             try {
                 const res = await fetch('data_all.json');
-                if (!res.ok) throw new Error('Network response was not ok');
                 lottoAllData = await res.json();
-                console.log("Data All loaded:", lottoAllData.history.length);
-            } catch (e) {
-                console.error("Data load failed:", e);
-                if (window.location.protocol === 'file:') {
-                    alert("⚠️ 보안 정책으로 인해 로컬에서는 데이터를 불러올 수 없습니다.\n\n해결방법:\n1. 터미널에서 'python -m http.server' 실행 후 접속\n2. 또는 배포된 사이트에서 테스트");
-                }
-            }
+            } catch (e) { console.error("데이터 로딩 실패", e); }
         }
         loadLottoData();
 
         imageInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
-            
-            selectedFile = file; 
-            
+            selectedFile = file;
             const reader = new FileReader();
             reader.onload = (event) => {
                 selectedImage.src = event.target.result;
                 previewContainer.style.display = 'block';
                 ocrStatus.innerText = "📸 이미지가 선택되었습니다. [🤖 AI 스마트 스캔] 버튼을 눌러주세요.";
                 ocrStatus.style.color = "var(--primary-cyan)";
-                scanResult.style.display = 'none';
-                winStatus.style.display = 'none';
+                scanResult.style.display = 'none'; winStatus.style.display = 'none';
             };
             reader.readAsDataURL(file);
         });
-
-        // Helper: Wait function (MUST be defined before use)
-        const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
         aiScanBtn.addEventListener('click', async () => {
             const apiKey = apiKeyInput.value.trim();
             if (!apiKey) return alert("Gemini API Key를 입력해주세요!");
             if (!selectedFile) return alert("먼저 로또 사진을 선택해주세요!");
-
-            ocrStatus.innerText = "🤖 AI가 영수증 분석 중... (수 초 소요)";
-            ocrStatus.style.color = "var(--primary-yellow)";
-            scanResult.style.display = 'none';
-            
-            // Priority: Models based on user's available quota list
+            ocrStatus.innerText = "🤖 AI가 영수증 분석 중... (수 초 소요)"; ocrStatus.style.color = "var(--primary-yellow)";
             const modelNames = ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-3-flash"];
             let success = false;
-
             for (const modelName of modelNames) {
                 try {
-                    console.log(`🚀 Attempting AI Scan with model: ${modelName}...`);
                     const genAI = new GoogleGenerativeAI(apiKey);
                     const model = genAI.getGenerativeModel({ model: modelName });
-
                     const base64Data = await fileToGenerativePart(selectedFile);
-                    const prompt = `이 로또 6/45 영수증 이미지에서 회차(draw_no)와 각 라인(A, B, C, D, E)의 번호 6개를 추출해서 JSON으로만 응답해줘. 
-                    결과 형식: {"draw_no": 1205, "lines": {"A": [1, 2, 3, 4, 5, 6], "B": [10, 11, 12, 13, 14, 15]}} 
-                    텍스트 설명은 절대 하지 마.`;
-
+                    const prompt = `이 로또 6/45 영수증 이미지에서 회차(draw_no)와 각 라인(A, B, C, D, E)의 번호 6개를 추출해서 JSON으로만 응답해줘. 결과 형식: {"draw_no": 1205, "lines": {"A": [1, 2, 3, 4, 5, 6]}}. 텍스트 설명 금지.`;
                     const result = await model.generateContent([prompt, base64Data]);
-                    const response = await result.response;
-                    const text = response.text();
-                    
-                    const jsonMatch = text.match(/\{[\s\S]*\}/);
-                    if (!jsonMatch) throw new Error("JSON 추출 실패");
-                    
-                    const data = JSON.parse(jsonMatch[0]);
+                    const text = (await result.response).text();
+                    const data = JSON.parse(text.match(/\{[\s\S]*\}/)[0]);
                     populateFields(data);
-                    
-                    ocrStatus.innerText = `✅ AI 분석 완료! (사용한 모델: ${modelName})`;
-                    ocrStatus.style.color = "var(--ball-green)";
-                    success = true;
-                    break; 
+                    ocrStatus.innerText = "✅ AI 분석 완료!"; ocrStatus.style.color = "var(--ball-green)";
+                    success = true; break;
                 } catch (err) {
-                    console.warn(`⚠️ Model ${modelName} failed:`, err.message);
-                    
-                    // Handle Quota Limit
-                    if (err.message.includes("429") || err.message.includes("quota")) {
-                        if (modelName !== modelNames[modelNames.length - 1]) {
-                            ocrStatus.innerText = `⏳ 할당량 초과로 인해 다른 모델로 전환 중...`;
-                            await wait(3000); 
-                            continue;
-                        }
-                    }
-
-                    // Handle Auth
-                    if (err.message.includes("401") || err.message.includes("API_KEY_INVALID")) {
-                        ocrStatus.innerText = "❌ 분석 실패: API 키가 올바르지 않습니다.";
-                        ocrStatus.style.color = "var(--primary-pink)";
-                        return;
-                    }
+                    if (err.message.includes("429")) { await wait(3500); continue; }
+                    ocrStatus.innerText = "❌ 분석 실패: " + err.message; break;
                 }
-            }
-
-            if (!success) {
-                ocrStatus.innerText = "❌ 모든 AI 모델 연결에 실패했습니다. (무료 할당량이 소진되었거나, 다른 로또 사진으로 다시 시도해주세요)";
-                ocrStatus.style.color = "var(--primary-pink)";
             }
         });
 
         async function fileToGenerativePart(file) {
-            const base64EncodedDataPromise = new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result.split(',')[1]);
-                reader.readAsDataURL(file);
-            });
-            return {
-                inlineData: { data: await base64EncodedDataPromise, mimeType: file.type },
-            };
+            const base64 = await new Promise(r => { const f = new FileReader(); f.onloadend = () => r(f.result.split(',')[1]); f.readAsDataURL(file); });
+            return { inlineData: { data: base64, mimeType: file.type } };
         }
 
         function populateFields(data) {
-            scanResult.style.display = 'block';
-            linesContainer.innerHTML = '';
+            scanResult.style.display = 'block'; linesContainer.innerHTML = '';
             scannedDrawNo.value = data.draw_no || "";
-
-            const slots = ['A', 'B', 'C', 'D', 'E'];
-            slots.forEach(char => {
+            ['A', 'B', 'C', 'D', 'E'].forEach(char => {
                 const nums = data.lines[char];
                 const div = document.createElement('div');
-                div.style.marginBottom = '10px';
-                div.style.display = 'flex';
-                div.style.alignItems = 'center';
-                div.style.gap = '10px';
-                div.innerHTML = `
-                    <strong style="width: 25px; color: var(--primary-pink);">${char}</strong>
-                    <input type="text" class="line-input" data-line="${char}" value="${nums ? nums.join(' ') : ''}" 
-                           placeholder="인식 실패 (직접 입력 가능)" 
-                           style="flex: 1; background: #1a1a2e; color: #fff; border: 1px solid #333; padding: 10px; border-radius: 8px; font-family: monospace;">
-                `;
+                div.style.cssText = "margin-bottom:10px; display:flex; align-items:center; gap:10px;";
+                div.innerHTML = `<strong style="width:25px; color:var(--primary-pink);">${char}</strong><input type="text" class="line-input" data-line="${char}" value="${nums ? nums.join(' ') : ''}" placeholder="인식 실패" style="flex:1; background:#1a1a2e; color:#fff; border:1px solid #333; padding:10px; border-radius:8px;">`;
                 linesContainer.appendChild(div);
             });
         }
 
-        // Keep Verification logic
         verifyButton.addEventListener('click', () => {
-            if (!lottoAllData) return alert("데이터 로딩 중입니다.");
             const targetDrawNo = parseInt(scannedDrawNo.value);
             const winDraw = lottoAllData.history.find(h => h.draw_no === targetDrawNo);
-            if (!winDraw) return alert(`${targetDrawNo}회차 당첨 정보를 찾을 수 없습니다.`);
-
-            const winNums = [winDraw.num1, winDraw.num2, winDraw.num3, winDraw.num4, winDraw.num5, winDraw.num6];
-            const bonus = winDraw.bonus;
-
+            if (!winDraw) return alert(`${targetDrawNo}회차 정보를 찾을 수 없습니다.`);
+            const winNums = [winDraw.num1, winDraw.num2, winDraw.num3, winDraw.num4, winDraw.num5, winDraw.num6], bonus = winDraw.bonus;
             winStatus.style.display = 'block';
-            winDetail.innerHTML = `<h3 style="text-align:center; color: var(--primary-cyan); margin-bottom:15px;">[${targetDrawNo}회 당첨번호: ${winNums.join(', ')} + ${bonus}]</h3>`;
-
+            winDetail.innerHTML = `<h3 style="text-align:center; color:var(--primary-cyan);">[${targetDrawNo}회 당첨번호: ${winNums.join(', ')} + ${bonus}]</h3>`;
             document.querySelectorAll('.line-input').forEach(input => {
-                const char = input.getAttribute('data-line');
-                const val = input.value.trim();
-                if (!val) return;
+                const val = input.value.trim(); if (!val) return;
                 const userNums = val.split(/\s+/).map(n => parseInt(n));
                 const matches = userNums.filter(n => winNums.includes(n));
                 const hasBonus = userNums.includes(bonus);
-                let rank = "낙첨", rankColor = "#888";
-                if (matches.length === 6) { rank = "1등 당첨! 🏆"; rankColor = "var(--primary-yellow)"; }
-                else if (matches.length === 5 && hasBonus) { rank = "2등 당첨! 🥈"; rankColor = "var(--primary-cyan)"; }
-                else if (matches.length === 5) { rank = "3등 당첨! 🥉"; rankColor = "var(--primary-pink)"; }
-                else if (matches.length === 4) { rank = "4등 (5만원) 💰"; rankColor = "var(--ball-green)"; }
-                else if (matches.length === 3) { rank = "5등 (5천원) 🍀"; rankColor = "var(--ball-green)"; }
-
+                let rank = "낙첨", color = "#888";
+                if (matches.length === 6) { rank = "1등! 🏆"; color = "var(--primary-yellow)"; }
+                else if (matches.length === 5 && hasBonus) { rank = "2등! 🥈"; color = "var(--primary-cyan)"; }
+                else if (matches.length === 5) { rank = "3등! 🥉"; color = "var(--primary-pink)"; }
+                else if (matches.length === 4) { rank = "4등 (5만원)"; color = "var(--ball-green)"; }
+                else if (matches.length === 3) { rank = "5등 (5천원)"; color = "var(--ball-green)"; }
                 const ballHtml = userNums.map(n => {
-                    const isWin = winNums.includes(n), isBonus = (n === bonus);
-                    const color = isWin ? 'var(--primary-yellow)' : (isBonus ? 'var(--primary-cyan)' : '#333');
-                    return `<span style="display:inline-block; width:25px; height:25px; line-height:25px; border-radius:50%; background:${color}; color:${isWin || isBonus ? '#000' : '#888'}; font-size:12px; font-weight:bold; margin-right:3px; text-align:center; border:1px solid #555;">${n}</span>`;
+                    const isWin = winNums.includes(n), isB = (n === bonus);
+                    const bc = isWin ? 'var(--primary-yellow)' : (isB ? 'var(--primary-cyan)' : '#333');
+                    return `<span style="display:inline-block; width:25px; height:25px; line-height:25px; border-radius:50%; background:${bc}; color:${isWin||isB?'#000':'#888'}; font-size:12px; font-weight:bold; margin-right:3px; text-align:center;">${n}</span>`;
                 }).join('');
-
-                winDetail.innerHTML += `<div style="margin-bottom: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;"><span style="font-weight:bold; margin-right:10px;">${char}</span>${ballHtml}<span style="margin-left: 15px; font-weight:bold; color: ${rankColor};">${rank}</span></div>`;
+                winDetail.innerHTML += `<div style="margin-bottom:10px; padding:10px; background:rgba(255,255,255,0.05); border-radius:8px;"><span style="font-weight:bold; margin-right:10px;">${input.getAttribute('data-line')}</span>${ballHtml}<span style="margin-left: 15px; font-weight:bold; color:${color};">${rank}</span></div>`;
             });
-            winStatus.scrollIntoView({ behavior: 'smooth' });
         });
     </script>
 </body>

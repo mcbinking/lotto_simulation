@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>소개 - 로또 시뮬레이터</title>
+    <title>프로젝트 심층 분석 - 로또 시뮬레이터</title>
     <link rel="stylesheet" href="style.css">
     <meta name="google-adsense-account" content="ca-pub-3787589077058710">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3787589077058710" crossorigin="anonymous"></script>
 </head>
-<body>
+<body data-theme="dark">
     <header class="main-header">
         <div class="logo">🎱 Lotto Sim</div>
         <div class="settings-group">
@@ -18,178 +18,56 @@
                 <a href="stats.html">통계</a>
                 <a href="scan.html">번호당첨확인<span style="font-size:0.6rem; vertical-align:top;">(Beta)</span></a>
             </nav>
-            <button id="langToggle" class="toggle-btn">ENG</button>
-            <button id="themeToggle" class="toggle-btn">🌞</button>
         </div>
     </header>
 
     <div class="container" style="text-align: left; max-width: 800px; padding-bottom: 100px;">
-        <h1 class="title" data-ko="프로젝트 심층 분석" data-en="Deep Dive">프로젝트 심층 분석</h1>
+        <h1 class="title">프로젝트 심층 분석</h1>
         
         <section class="info-section">
-            <h2 style="color: var(--primary-yellow); border-bottom: 1px solid var(--primary-yellow); padding-bottom: 10px; margin-bottom: 20px;">
-                ⚙️ 알고리즘과 공학적 원리
-            </h2>
-            
+            <h2 style="color: var(--primary-yellow); border-bottom: 1px solid var(--primary-yellow); padding-bottom: 10px; margin-bottom: 20px;">⚙️ 알고리즘과 공학적 원리</h2>
             <article>
                 <h3 style="color: var(--primary-cyan); margin-top: 30px;">1. 의사 난수 생성기 (PRNG)의 메커니즘</h3>
-                <p>
-                    디지털 환경에서 '진정한 무작위'를 구현하는 것은 매우 어렵습니다. 컴퓨터는 논리적인 연산 장치이기 때문입니다. 
-                    따라서 우리는 <strong>의사 난수 생성기(Pseudo-Random Number Generator, PRNG)</strong>를 사용합니다. 
-                    본 시뮬레이터는 사용자가 입력한 텍스트(Seed)를 엔트로피 소스로 활용하여 예측 불가능성을 극대화했습니다.
-                </p>
-                <p>
-                    적용된 알고리즘은 <strong>LCG (Linear Congruential Generator)</strong>의 변형으로, 
-                    초기값(Seed)에 큰 소수(Prime Number)를 곱하고 특정 상수를 더한 뒤, 모듈러 연산을 통해 다음 값을 도출합니다. 
-                    이 과정이 반복되면서 인간이 예측할 수 없는 복잡한 수열이 생성됩니다.
-                </p>
-                <div class="formula-box">
-                    X<sub>n+1</sub> = (1664525 · X<sub>n</sub> + 1013904223) mod 2<sup>32</sup>
-                </div>
+                <p>디지털 환경에서 '진정한 무작위'를 구현하는 것은 매우 어렵습니다. 컴퓨터는 논리적인 연산 장치이기 때문입니다. 따라서 우리는 <strong>의사 난수 생성기(Pseudo-Random Number Generator, PRNG)</strong>를 사용합니다. 본 시뮬레이터는 사용자가 입력한 텍스트(Seed)를 엔트로피 소스로 활용하여 예측 불가능성을 극대화했습니다.</p>
+                <p>적용된 알고리즘은 <strong>LCG (Linear Congruential Generator)</strong>의 변형으로, 초기값(Seed)에 큰 소수(Prime Number)를 곱하고 특정 상수를 더한 뒤, 모듈러 연산을 통해 다음 값을 도출합니다. 이 과정이 반복되면서 인간이 예측할 수 없는 복잡한 수열이 생성됩니다.</p>
+                <div class="formula-box">X<sub>n+1</sub> = (1664525 · X<sub>n</sub> + 1013904223) mod 2<sup>32</sup></div>
 
                 <h3 style="color: var(--primary-pink); margin-top: 30px;">2. Fisher-Yates 셔플 알고리즘</h3>
-                <p>
-                    1부터 45까지의 숫자 중 중복 없이 6개를 뽑는 과정은 '추출'보다는 '섞기(Shuffle)'에 가깝습니다. 
-                    단순히 랜덤하게 뽑고 중복을 체크하는 방식은 비효율적일 수 있습니다. 
-                    우리는 <strong>Fisher-Yates Shuffle</strong> 알고리즘을 채택하여, 
-                    수학적으로 편향(Bias)이 없는 완벽한 무작위 섞기를 구현했습니다. 
-                    이는 카드 게임이나 암호학에서도 널리 쓰이는 검증된 방식입니다.
-                </p>
+                <p>1부터 45까지의 숫자 중 중복 없이 6개를 뽑는 과정은 '추출'보다는 '섞기(Shuffle)'에 가깝습니다. 우리는 <strong>Fisher-Yates Shuffle</strong> 알고리즘을 채택하여, 수학적으로 편향(Bias)이 없는 완벽한 무작위 섞기를 구현했습니다.</p>
             </article>
         </section>
 
         <section class="info-section" style="margin-top: 50px;">
-            <h2 style="color: var(--primary-cyan); border-bottom: 1px solid var(--primary-cyan); padding-bottom: 10px; margin-bottom: 20px;">
-                📊 10만원 투자 시의 수학적 기대값 분석
-            </h2>
-            
+            <h2 style="color: var(--primary-cyan); border-bottom: 1px solid var(--primary-cyan); padding-bottom: 10px; margin-bottom: 20px;">📊 10만원 투자 시의 수학적 기대값 분석</h2>
             <article>
                 <h3 style="color: #fff; margin-top: 30px;">1. 등수별 확률과 당첨금 구조</h3>
-                <p>
-                    대한민국 로또 6/45의 수학적 기대값을 계산하기 위해서는 각 등수별 당첨 확률과 기대 당첨금을 정확히 산정해야 합니다. 
-                    다음은 1게임(1,000원) 기준의 공식 통계입니다.
-                </p>
+                <p>대한민국 로또 6/45의 수학적 기대값을 계산하기 위해서는 각 등수별 당첨 확률과 기대 당첨금을 정확히 산정해야 합니다. 다음은 1게임(1,000원) 기준의 공식 통계입니다.</p>
                 <div class="table-container" style="overflow-x: auto; margin: 20px 0;">
                     <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; color: #ccc;">
                         <thead>
                             <tr style="background: rgba(0, 243, 255, 0.1);">
-                                <th style="padding: 10px; border: 1px solid #444;">순위</th>
-                                <th style="padding: 10px; border: 1px solid #444;">당첨 조건</th>
-                                <th style="padding: 10px; border: 1px solid #444;">확률 (1/n)</th>
-                                <th style="padding: 10px; border: 1px solid #444;">평균 당첨금</th>
+                                <th style="padding: 10px; border: 1px solid #444;">순위</th><th style="padding: 10px; border: 1px solid #444;">확률</th><th style="padding: 10px; border: 1px solid #444;">평균 당첨금</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td style="padding: 10px; border: 1px solid #444;">1등</td>
-                                <td style="padding: 10px; border: 1px solid #444;">6개 일치</td>
-                                <td style="padding: 10px; border: 1px solid #444;">8,145,060</td>
-                                <td style="padding: 10px; border: 1px solid #444;">약 2,000,000,000원</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 10px; border: 1px solid #444;">2등</td>
-                                <td style="padding: 10px; border: 1px solid #444;">5개 + 보너스</td>
-                                <td style="padding: 10px; border: 1px solid #444;">1,357,510</td>
-                                <td style="padding: 10px; border: 1px solid #444;">약 60,000,000원</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 10px; border: 1px solid #444;">3등</td>
-                                <td style="padding: 10px; border: 1px solid #444;">5개 일치</td>
-                                <td style="padding: 10px; border: 1px solid #444;">35,724</td>
-                                <td style="padding: 10px; border: 1px solid #444;">약 1,500,000원</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 10px; border: 1px solid #444;">4등</td>
-                                <td style="padding: 10px; border: 1px solid #444;">4개 일치</td>
-                                <td style="padding: 10px; border: 1px solid #444;">733</td>
-                                <td style="padding: 10px; border: 1px solid #444;">50,000원 (확정)</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 10px; border: 1px solid #444;">5등</td>
-                                <td style="padding: 10px; border: 1px solid #444;">3개 일치</td>
-                                <td style="padding: 10px; border: 1px solid #444;">45</td>
-                                <td style="padding: 10px; border: 1px solid #444;">5,000원 (확정)</td>
-                            </tr>
+                            <tr><td style="padding: 10px; border: 1px solid #444;">1등</td><td style="padding: 10px; border: 1px solid #444;">1/8,145,060</td><td style="padding: 10px; border: 1px solid #444;">약 20억원</td></tr>
+                            <tr><td style="padding: 10px; border: 1px solid #444;">5등</td><td style="padding: 10px; border: 1px solid #444;">1/45</td><td style="padding: 10px; border: 1px solid #444;">5,000원</td></tr>
                         </tbody>
                     </table>
                 </div>
-
-                <h3 style="color: #fff; margin-top: 30px;">2. 10만원(100게임) 구매 시의 기대값 계산</h3>
-                <p>
-                    수학적 기대값(E)은 <strong>Σ(당첨금_i × 확률_i)</strong>로 계산됩니다. 1게임당 기대값은 다음과 같습니다:
-                </p>
-                <ul style="color: #ccc; line-height: 1.8;">
-                    <li>1등 기여분: 2,000,000,000 / 8,145,060 ≈ 245.5원</li>
-                    <li>2등 기여분: 60,000,000 / 1,357,510 ≈ 44.2원</li>
-                    <li>3등 기여분: 1,500,000 / 35,724 ≈ 42.0원</li>
-                    <li>4등 기여분: 50,000 / 733 ≈ 68.2원</li>
-                    <li>5등 기여분: 5,000 / 45 ≈ 111.1원</li>
-                </ul>
-                <p>
-                    이를 모두 합산하면 1게임당 총 기대값은 약 <strong>511원</strong>이 됩니다. 
-                    따라서 10만원(100게임)을 투자했을 때 사용자가 돌려받을 것으로 기대되는 수학적 금액은 <strong>약 51,100원</strong>입니다.
-                </p>
-
-                <h3 style="color: #fff; margin-top: 30px;">3. 결론: 왜 항상 손해를 보는가?</h3>
-                <p>
-                    로또는 판매 대금의 50%를 운영비 및 공익 기금으로 우선 공제한 뒤, 남은 50%만을 당첨금 재원으로 사용합니다. 
-                    이로 인해 수학적 기대값은 항상 투자 원금의 약 절반 수준에 머물게 됩니다. 
-                    특히 고액 당첨금(1~3등)은 확률이 극히 희박하므로, 실질적으로 대다수의 이용자는 4등과 5등 당첨을 통한 소액 환급만을 경험하게 되며 전체적으로는 투자금의 90% 이상을 잃는 경우가 빈번합니다.
-                </p>
+                <p>이를 합산하면 1게임당 총 기대값은 약 <strong>511원</strong>이 됩니다. 따라서 10만원(100게임) 투자 시 기대 수익은 <strong>약 51,100원</strong>입니다.</p>
             </article>
         </section>
 
         <section class="info-section" style="margin-top: 50px;">
-            <h2 style="color: var(--ball-green); border-bottom: 1px solid var(--ball-green); padding-bottom: 10px; margin-bottom: 20px;">
-                📜 복권의 역사와 인문학
-            </h2>
-            
+            <h2 style="color: var(--ball-green); border-bottom: 1px solid var(--ball-green); padding-bottom: 10px; margin-bottom: 20px;">📜 복권의 역사와 인문학</h2>
             <article>
-                <h3 style="color: #fff; margin-top: 30px;">고대 로마에서 현대까지</h3>
-                <p>
-                    복권의 기원은 고대 로마 시대로 거슬러 올라갑니다. 
-                    당시 황제들은 축제 기간 동안 노예나 집 등을 경품으로 걸고 추첨을 진행했으며, 
-                    이는 공공사업 자금을 마련하는 수단이기도 했습니다. 
-                    <br><br>
-                    현대적 의미의 복권은 15세기 네덜란드와 벨기에 지역에서 시작되었습니다. 
-                    'Lotto'라는 단어 역시 운명이나 몫을 뜻하는 이탈리아어 'Lotto'에서 유래했습니다. 
-                    한국에서는 2002년 로또 6/45가 처음 도입되어 현재에 이르고 있습니다.
-                </p>
-
-                <h3 style="color: #fff; margin-top: 30px;">확률의 미학</h3>
-                <p>
-                    로또 1등 당첨 확률인 814만 분의 1은 수학적으로 매우 희박한 확률입니다. 
-                    하지만 매주 당첨자가 나오는 이유는 '대수의 법칙(Law of Large Numbers)' 때문입니다. 
-                    충분히 많은 시행(수천만 건의 구매)이 이루어지면, 통계적으로 거의 모든 조합이 선택되기 때문입니다. 
-                    우리는 이 시뮬레이터를 통해 그 거대한 확률의 바다를 간접 체험할 수 있습니다.
-                </p>
+                <p>복권의 기원은 고대 로마 시대로 거슬러 올라갑니다. 당시 황제들은 축제 기간 동안 경품으로 걸고 추첨을 진행했으며, 현대적 의미의 복권은 15세기 유럽에서 시작되었습니다. 한국에서는 2002년 로또 6/45가 처음 도입되어 현재에 이르고 있습니다.</p>
             </article>
-        </section>
-
-        <section class="info-section" style="margin-top: 50px; border-color: #555;">
-            <h2 style="color: #aaa; border-bottom: 1px solid #555; padding-bottom: 10px; margin-bottom: 20px;">
-                🛡️ 건전한 이용 안내 (Responsible Gaming)
-            </h2>
-            <p>
-                본 사이트는 실제 금전이 오가는 도박 사이트가 아니며, 오직 재미와 통계적 호기심을 위해 제작되었습니다. 
-                복권은 소액으로 건전하게 즐길 때 가장 아름답습니다. 
-                과도한 몰입은 지양하시고, 일주일의 작은 활력소로만 즐겨주시기를 권장합니다.
-            </p>
         </section>
     </div>
 
-    <footer class="main-footer">
-        <p>&copy; 2026 Lotto Simulator. All rights reserved.</p>
-        <div class="footer-links">
-            <a href="privacy.html" data-ko="개인정보처리방침" data-en="Privacy Policy">개인정보처리방침</a>
-            <span>|</span>
-            <a href="mailto:contact@example.com" data-ko="문의하기" data-en="Contact">문의하기</a>
-            <br>
-            <div class="disclaimer" style="font-size: 0.7rem; padding: 5px; margin-top: 10px;" data-ko="⚠️ 본 사이트는 재미를 위한 시뮬레이션이며 실제 당첨을 보장하지 않습니다." data-en="⚠️ This is a simulation for fun and does not guarantee winning.">
-                ⚠️ 본 사이트는 재미를 위한 시뮬레이션이며 실제 당첨을 보장하지 않습니다.
-            </div>
-        </div>
-    </footer>
+    <footer class="main-footer"><p>&copy; 2026 Lotto Simulator. All rights reserved.</p></footer>
     <script src="script.js"></script>
 </body>
 </html>
