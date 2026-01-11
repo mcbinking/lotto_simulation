@@ -172,8 +172,8 @@
             ocrStatus.style.color = "var(--primary-yellow)";
             scanResult.style.display = 'none';
             
-            // Priority: gemini-1.5-flash is the most stable and available model for free tier
-            const modelNames = ["gemini-1.5-flash", "gemini-1.5-flash-8b", "gemini-2.0-flash"];
+            // Priority: Models based on user's available quota list
+            const modelNames = ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-3-flash"];
             let success = false;
 
             for (const modelName of modelNames) {
