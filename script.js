@@ -118,56 +118,62 @@ document.addEventListener('DOMContentLoaded', () => {
             similarityReport.appendChild(li);
         });
 
-        // 3. 100게임 시뮬레이션
+        // 3. 100 Game Simulation vs Latest
         const latest = lottoAllData.history[0];
         const winNums = [latest.num1, latest.num2, latest.num3, latest.num4, latest.num5, latest.num6];
-        const bonus = latest.bonus;
-        
         let totalPrize = 0;
         let counts = { 1:0, 2:0, 3:0, 4:0, 5:0 };
-        
-        const allCombos = [];
-        allCombos.push([...currentNumbers]); 
+        const base4 = currentNumbers.slice(0, 4);
 
-        for (let i = 5; i >= 0; i--) { 
-            let combo = [...currentNumbers];
-            let r; do { r = Math.floor(Math.random() * 45) + 1; } while (currentNumbers.includes(r));
-            combo[i] = r; allCombos.push(combo.sort((a, b) => a - b));
-        }
-
-        const base4 = currentNumbers.slice(0, 4); 
-        while (allCombos.length < 100) {
+        for (let i = 0; i < 100; i++) {
             let combo = [...base4];
-            while (combo.length < 6) {
-                let r = Math.floor(Math.random() * 45) + 1;
-                if (!combo.includes(r)) combo.push(r);
+            while(combo.length < 6) {
+                let r = Math.floor(Math.random()*45)+1;
+                if(!combo.includes(r)) combo.push(r);
             }
-            allCombos.push(combo.sort((a, b) => a - b));
-        }
-
-        allCombos.forEach(combo => {
             const match = combo.filter(x => winNums.includes(x)).length;
-            const hasBonus = combo.includes(bonus);
-            if (match === 6) { totalPrize += 2000000000; counts[1]++; }
-            else if (match === 5 && hasBonus) { totalPrize += 60000000; counts[2]++; }
-            else if (match === 5) { totalPrize += 1500000; counts[3]++; }
-            else if (match === 4) { totalPrize += 50000; counts[4]++; }
-            else if (match === 3) { totalPrize += 5000; counts[5]++; }
-        });
+            if(match === 6) { totalPrize += 2000000000; counts[1]++; }
+            else if(match === 5 && combo.includes(latest.bonus)) { totalPrize += 50000000; counts[2]++; }
+            else if(match === 5) { totalPrize += 1500000; counts[3]++; }
+            else if(match === 4) { totalPrize += 50000; counts[4]++; }
+            else if(match === 3) { totalPrize += 5000; counts[5]++; }
+        }
 
         simulationResults.innerHTML = `
-            <div style="padding: 10px; border: 1px solid rgba(0, 243, 255, 0.3); border-radius: 5px;">
-                <p>💰 총 당첨금: <strong style="font-size: 1.1rem; color:var(--primary-yellow);">${totalPrize.toLocaleString()}원</strong></p>
+            <p>💰 총 당첨금: <strong>${totalPrize.toLocaleString()}원</strong></p>
+            <p style="font-size: 0.8rem; margin-top:5px;">4등: ${counts[4]}회 / 5등: ${counts[5]}회 (최신 ${latest.draw_no}회 대조)</p>
+        `;
+
+        // 4. 10-Year Backtest (매주 1회 구매 시뮬레이션)
+        const tenYearsHistory = lottoAllData.history.slice(0, 520);
+        let backtestPrize = 0;
+        let btCounts = { 1:0, 2:0, 3:0, 4:0, 5:0 };
+
+        tenYearsHistory.forEach(h => {
+            const hNums = [h.num1, h.num2, h.num3, h.num4, h.num5, h.num6];
+            const match = currentNumbers.filter(x => hNums.includes(x)).length;
+            if(match === 6) { backtestPrize += 2000000000; btCounts[1]++; }
+            else if(match === 5 && currentNumbers.includes(h.bonus)) { backtestPrize += 50000000; btCounts[2]++; }
+            else if(match === 5) { backtestPrize += 1500000; btCounts[3]++; }
+            else if(match === 4) { backtestPrize += 50000; btCounts[4]++; }
+            else if(match === 3) { backtestPrize += 5000; btCounts[5]++; }
+        });
+
+        const backtestResults = document.getElementById('backtestResults');
+        if (backtestResults) {
+            backtestResults.innerHTML = `
+                <p>💰 10년 총 당첨금: <strong style="font-size: 1.1rem;">${backtestPrize.toLocaleString()}원</strong></p>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 10px; font-size: 0.85rem;">
-                    <div>1등(6개): ${counts[1]}회</div><div>2등(5개+B): ${counts[2]}회</div>
-                    <div>3등(5개): ${counts[3]}회</div><div>4등(4개): ${counts[4]}회</div>
-                    <div>5등(3개): ${counts[5]}회</div>
+                    <div>3등 이상: ${btCounts[1] + btCounts[2] + btCounts[3]}회</div>
+                    <div>4등(5만원): ${btCounts[4]}회</div>
+                    <div>5등(5천원): ${btCounts[5]}회</div>
+                    <div>구매 비용: 520,000원</div>
                 </div>
-                <p style="margin-top: 10px; font-size: 0.8rem; color: #888;">
-                    * 분석 조건: 원본 1조합 + 번호 1개 변형 6조합 + 반자동(4개 고정) 93조합<br>
-                    * 실제 <strong>${latest.draw_no}회차</strong> 결과와 대조한 가상 당첨금입니다.
+                <p style="margin-top: 10px; font-size: 0.8rem; opacity: 0.8;">
+                    * 지난 10년(520주) 동안 매주 이 번호 세트로 1게임씩 구매했다고 가정한 결과입니다.
                 </p>
-            </div>`;
+            `;
+        }
         
         analysisReport.scrollIntoView({ behavior: 'smooth' });
     }

@@ -87,8 +87,19 @@
             <div style="margin-bottom: 20px;">
                 <h4 style="color: var(--ball-green);">2. 10만원(100게임) 투자 시뮬레이션</h4>
                 <div id="simulationReport" style="font-size: 0.9rem; color: #ccc; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px;">
-                    <p>현재 번호의 앞 4개를 고정하고 나머지 2개만 바꿔서 100조합을 생성, 최신 회차 결과와 대조한 결과입니다.</p>
-                    <div id="simulationResults" style="margin-top: 10px; color: var(--primary-yellow);"></div>
+                    <p>나만의 번호를 포함한 100가지 경우 조합(현재 번호, 1개만 바꾼 경우, 5/6번째 번호 두 개를 여러 조합으로 바꾼 경우)을 생성, 최신 회차 결과와 대조한 당첨금 기대값 결과입니다.</p>
+                    <div id="simulationResults" style="margin-top: 10px; color: var(--primary-yellow);">
+                        계산 중...
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h4 style="color: var(--primary-cyan);">3. 나만의 번호로 과거 10년 동안 매주 빠짐없이 로또를 구매했다면 총 당첨금은 얼마일까요?</h4>
+                <div id="backtestReport" style="font-size: 0.9rem; color: #ccc; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px;">
+                    <div id="backtestResults" style="color: var(--primary-cyan);">
+                        데이터 분석 중...
+                    </div>
                 </div>
             </div>
         </div>
